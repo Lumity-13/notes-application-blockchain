@@ -28,4 +28,33 @@ public class BlockchainController {
                 .map(block -> ResponseEntity.ok(block))
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/validate")
+    public ResponseEntity<String> validateChain() {
+        List<Block> blocks = blockRepository.findAll();
+
+        for (int i = 1; i < blocks.size(); i++) {
+            Block previous = blocks.get(i - 1);
+            Block current = blocks.get(i);
+
+            // Recompute hash consistently
+            String dataToHash = current.getNote().getNoteId()
+                    + current.getNote().getContent()
+                    + current.getNote().getUser().getUserId()
+                    + current.getPreviousHash();
+            String recalculatedHash = com.notesapp.backend.util.HashUtil.sha256(dataToHash);
+
+            // Check if hashes match
+            if (!current.getHash().equals(recalculatedHash)) {
+                return ResponseEntity.ok("Blockchain is INVALID at block " + current.getBlockId());
+            }
+
+            // Check if previousHash matches
+            if (!current.getPreviousHash().equals(previous.getHash())) {
+                return ResponseEntity.ok("Blockchain is BROKEN at block " + current.getBlockId());
+            }
+        }
+
+        return ResponseEntity.ok("Blockchain is VALID. Total blocks: " + blocks.size());
+    }
 }

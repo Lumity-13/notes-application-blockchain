@@ -9,33 +9,25 @@ public class Note {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long note_id;
+    @Column(name = "note_id")
+    private Long noteId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)  // foreign key
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
-    private LocalDateTime created_at = LocalDateTime.now();
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    // --- Constructors ---
-    public Note() {}
-
-    public Note(User user, String content) {
-        this.user = user;
-        this.content = content;
+    // --- Getters & Setters ---
+    public Long getNoteId() {
+        return noteId;
     }
 
-    // --- Getters and Setters ---
-    public Long getNote_id() {
-        return note_id;
-    }
-
-    public void setNote_id(Long note_id) {
-        this.note_id = note_id;
+    public void setNoteId(Long noteId) {
+        this.noteId = noteId;
     }
 
     public User getUser() {
@@ -54,11 +46,12 @@ public class Note {
         this.content = content;
     }
 
-    public LocalDateTime getCreated_at() {
-        return created_at;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated_at(LocalDateTime created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
+

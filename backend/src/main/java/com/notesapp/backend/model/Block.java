@@ -9,29 +9,30 @@ public class Block {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "block_id")   // maps Java field to DB column
+    @Column(name = "block_id")
     private Long blockId;
 
     @OneToOne
     @JoinColumn(name = "note_id", nullable = false)
     private Note note;
 
-    @Column(nullable = false)
     private LocalDateTime timestamp = LocalDateTime.now();
 
     @Column(name = "previous_hash")
     private String previousHash;
 
-    @Column(nullable = false)
     private String hash;
 
     // --- Constructors ---
-    public Block() {}
+    public Block() {
+        // Required by JPA
+    }
 
     public Block(Note note, String previousHash, String hash) {
         this.note = note;
         this.previousHash = previousHash;
         this.hash = hash;
+        this.timestamp = LocalDateTime.now();
     }
 
     // --- Getters & Setters ---
@@ -75,4 +76,5 @@ public class Block {
         this.hash = hash;
     }
 }
+
 

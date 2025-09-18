@@ -52,10 +52,14 @@ public class NoteController {
                     // Blockchain step
                     Block previousBlock = blockRepository.findTopByOrderByBlockIdDesc();
                     String previousHash = (previousBlock != null) ? previousBlock.getHash() : "0"; // Genesis block if none
-                    String dataToHash = savedNote.getNote_id() + savedNote.getContent() + previousHash + savedNote.getCreated_at();
+                    String dataToHash = savedNote.getNoteId() 
+                            + savedNote.getContent() 
+                            + savedNote.getUser().getUserId() 
+                            + previousHash;
                     String newHash = HashUtil.sha256(dataToHash);
 
                     Block newBlock = new Block(savedNote, previousHash, newHash);
+                    blockRepository.save(newBlock);
                     blockRepository.save(newBlock);
 
                     return ResponseEntity.ok(savedNote);
