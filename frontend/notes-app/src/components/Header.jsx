@@ -1,28 +1,8 @@
 import React, { useState } from 'react';
 import FileDropdown from './FileDropdown';
 import EditDropdown from './EditDropdown';
-// import AccountDropdown from './AccountDropdown';
-
-const AccountDropdown = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
-  return (
-    <div style={{
-      position: 'absolute',
-      top: '100%',
-      right: 0,
-      background: '#1a1f3a',
-      border: '1px solid #2a2f55',
-      borderRadius: '4px',
-      padding: '8px 0',
-      minWidth: '120px',
-      zIndex: 1000
-    }}>
-      <div style={{ padding: '8px 16px', color: '#e7e9ff' }}>Profile</div>
-      <div style={{ padding: '8px 16px', color: '#e7e9ff' }}>Settings</div>
-      <div style={{ padding: '8px 16px', color: '#e7e9ff' }}>Logout</div>
-    </div>
-  );
-};
+import AccountDropdown from './AccountDropdown';
+import './Header.css';
 
 const Header = ({ onBackToHome }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -42,68 +22,11 @@ const Header = ({ onBackToHome }) => {
     setActiveDropdown(null);
   };
 
-  const headerStyles = {
-    header: {
-      background: '#1a1f3a',
-      padding: '12px 16px',
-      borderBottom: '1px solid #2a2f55',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    leftSection: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '16px',
-    },
-    homeButton: {
-      background: 'none',
-      border: 'none',
-      color: '#e7e9ff',
-      cursor: 'pointer',
-      padding: '8px',
-      borderRadius: '4px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    menuBar: {
-      display: 'flex',
-      gap: '8px',
-    },
-    menuItem: {
-      position: 'relative',
-    },
-    menuButton: {
-      background: 'none',
-      border: 'none',
-      color: '#e7e9ff',
-      cursor: 'pointer',
-      padding: '8px 12px',
-      borderRadius: '4px',
-      fontSize: '14px',
-    },
-    accountSection: {
-      position: 'relative',
-    },
-    accountButton: {
-      background: 'none',
-      border: 'none',
-      color: '#e7e9ff',
-      cursor: 'pointer',
-      padding: '8px',
-      borderRadius: '4px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  };
-
   return (
-    <header style={headerStyles.header}>
-      <div style={headerStyles.leftSection}>
+    <header className="header">
+      <div className="left-section">
         <button 
-          style={headerStyles.homeButton}
+          className="home-button"
           onClick={() => {
             console.log('Home button clicked');
             onBackToHome();
@@ -115,10 +38,10 @@ const Header = ({ onBackToHome }) => {
           </svg>
         </button>
         
-        <div style={headerStyles.menuBar}>
-          <div style={headerStyles.menuItem}>
+        <div className="menu-bar">
+          <div className="menu-item">
             <button 
-              style={headerStyles.menuButton}
+              className="menu-button"
               onClick={() => toggleDropdown('file')}
             >
               File
@@ -129,9 +52,9 @@ const Header = ({ onBackToHome }) => {
             />
           </div>
           
-          <div style={headerStyles.menuItem}>
+          <div className="menu-item">
             <button 
-              style={headerStyles.menuButton}
+              className="menu-button"
               onClick={() => toggleDropdown('edit')}
             >
               Edit
@@ -144,9 +67,9 @@ const Header = ({ onBackToHome }) => {
         </div>
       </div>
 
-      <div style={headerStyles.accountSection}>
+      <div className="account-section">
         <button 
-          style={headerStyles.accountButton}
+          className="account-button"
           onClick={() => toggleDropdown('account')}
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">

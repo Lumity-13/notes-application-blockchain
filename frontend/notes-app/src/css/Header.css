@@ -1,0 +1,151 @@
+/* Header Component Styles */
+.header {
+  background: #1a1f3a;
+  padding: 12px 16px;
+  border-bottom: 1px solid #2a2f55;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.home-button {
+  background: none;
+  border: none;
+  color: #e7e9ff;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.home-button:hover {
+  background-color: #2a2f55;
+}
+
+.menu-bar {
+  display: flex;
+  gap: 8px;
+}
+
+.menu-item {
+  position: relative;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  color: #e7e9ff;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.menu-button:hover {
+  background-color: #2a2f55;
+}
+
+.account-section {
+  position: relative;
+}
+
+.account-button {
+  background: none;
+  border: none;
+  color: #e7e9ff;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.account-button:hover {
+  background-color: #2a2f55;
+}
+
+/* Dropdown Styles */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #1a1f3a;
+  border: 1px solid #2a2f55;
+  border-radius: 8px;
+  padding: 8px 0;
+  min-width: 180px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease-in-out;
+}
+
+.dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  color: #e7e9ff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+  margin: 2px 8px;
+}
+
+.dropdown-item:hover {
+  background-color: #2a2f55;
+  color: #ffffff;
+}
+
+.dropdown-item.placeholder {
+  color: #9ca3af;
+  cursor: default;
+  font-style: italic;
+  padding: 8px 16px;
+}
+
+.dropdown-item.placeholder:hover {
+  background-color: transparent;
+  color: #9ca3af;
+}
+
+.dropdown-item.logout-item {
+  border-top: 1px solid #2a2f55;
+  margin-top: 4px;
+  color: #ef4444;
+}
+
+.dropdown-item.logout-item:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+/* Account dropdown should align to the right */
+.account-dropdown {
+  right: 0;
+  left: auto;
+}
+
+/* Ensure proper stacking */
+.header {
+  position: relative;
+  z-index: 100;
+}
