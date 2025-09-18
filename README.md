@@ -6,7 +6,7 @@
 
 ## Overview
 
-This project implements a **decentralized notes application** that integrates fundamental blockchain principles. Each note is cryptographically linked to a blockchain block, creating an immutable ledger that ensures data integrity and demonstrates distributed ledger technology.
+This project implements a **decentralized notes application** that integrates fundamental blockchain principles. Each note is cryptographically linked to a blockchain block, creating an immutable ledger that ensures data integrity and demonstrates distributed ledger technology. It showcases how blockchain can be applied beyond cryptocurrencies by providing a secure and transparent way to store and manage personal notes. Users can create, view, and manage notes while experiencing how each entry becomes part of an immutable blockchain ledger, ensuring permanent and verifiable recordkeeping.
 
 ### Key Features
 - Cryptographic hash linking between blocks
@@ -44,7 +44,7 @@ notes-application-blockchain/
 *2AM Discord Decision*
 
 - **Cantiller, Christian Jayson J.**
-- **Diva, Justin Andry N.**  
+- **Diva, Justin Andry N.** *(Frontend Dev)*
 - **Lada, Nathan Xander** *(Backend Lead)*
 - **Go, Felix Christian T.**
 
