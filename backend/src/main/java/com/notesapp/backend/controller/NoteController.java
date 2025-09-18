@@ -2,8 +2,12 @@ package com.notesapp.backend.controller;
 
 import com.notesapp.backend.model.Note;
 import com.notesapp.backend.model.User;
+import com.notesapp.backend.repository.BlockRepository;
 import com.notesapp.backend.repository.NoteRepository;
 import com.notesapp.backend.repository.UserRepository;
+import com.notesapp.backend.util.HashUtil;
+import com.notesapp.backend.model.Block;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +24,16 @@ public class NoteController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BlockRepository blockRepository;
+
     // --- Get all notes ---
     @GetMapping
     public List<Note> getAllNotes() {
         return noteRepository.findAll();
     }
 
-    // --- Get notes by user ---
+    // --- Get all notes by a specific user ---
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Note>> getNotesByUser(@PathVariable Long userId) {
         return userRepository.findById(userId)
@@ -40,9 +47,21 @@ public class NoteController {
         return userRepository.findById(userId)
                 .map(user -> {
                     note.setUser(user);
-                    return ResponseEntity.ok(noteRepository.save(note));
+                    Note savedNote = noteRepository.save(note);
+
+                    // Blockchain step
+                    Block previousBlock = blockRepository.findTopByOrderByBlockIdDesc();
+                    String previousHash = (previousBlock != null) ? previousBlock.getHash() : "0"; // Genesis block if none
+                    String dataToHash = savedNote.getNote_id() + savedNote.getContent() + previousHash + savedNote.getCreated_at();
+                    String newHash = HashUtil.sha256(dataToHash);
+
+                    Block newBlock = new Block(savedNote, previousHash, newHash);
+                    blockRepository.save(newBlock);
+
+                    return ResponseEntity.ok(savedNote);
                 }).orElse(ResponseEntity.notFound().build());
     }
+
 
     // --- Delete note ---
     @DeleteMapping("/{id}")
