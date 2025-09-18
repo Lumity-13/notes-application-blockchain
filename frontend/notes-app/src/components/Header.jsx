@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import FileDropdown from './FileDropdown';
 import EditDropdown from './EditDropdown';
 import AccountDropdown from './AccountDropdown';
-import './Header.css';
+import '../css/Header.css';
 
 const Header = ({ onBackToHome }) => {
   const [activeDropdown, setActiveDropdown] = useState(null);
