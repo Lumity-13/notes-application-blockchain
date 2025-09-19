@@ -1,20 +1,15 @@
 import React, { useState } from 'react';
-// Import your actual Header component with dropdowns
 import Header from '../components/Header';
+import TabSystem from '../components/TabSystem';
+import '../css/LandingPage.css';
 
-const TextEditor = () => {
-  const [content, setContent] = useState('');
-
-  const handleContentChange = (e) => {
-    setContent(e.target.value);
-  };
-
+const TextEditor = ({ content, onChange }) => {
   return (
-    <div style={styles.textEditorContainer}>
+    <div className="landing-text-editor-container">
       <textarea
-        style={styles.textEditor}
+        className="landing-text-editor"
         value={content}
-        onChange={handleContentChange}
+        onChange={onChange}
         placeholder="Start typing your notes here..."
         spellCheck="false"
       />
@@ -23,86 +18,102 @@ const TextEditor = () => {
 };
 
 const LandingPage = ({ onStartNotepad = () => {} }) => {
-  return (
-    <div className="landing-page" style={styles.page}>
-      {/* Use the actual Header component with dropdowns */}
-      <Header onBackToHome={() => console.log('Back to home clicked')} />
+  const [tabs, setTabs] = useState([
+    {
+      id: 1,
+      title: 'Untitled-1',
+      content: '',
+      hasUnsavedChanges: false
+    }
+  ]);
+  const [activeTabId, setActiveTabId] = useState(1);
+  const [nextTabId, setNextTabId] = useState(2);
 
-      {/* Fill the remaining viewport with the editor */}
-      <main style={styles.main}>
-        <section style={styles.fullPreview}>
-          <h3 style={styles.previewTitle}>Live editor preview</h3>
-          <div style={styles.editorWrap}>
-            <TextEditor />
+  const getActiveTab = () => {
+    return tabs.find(tab => tab.id === activeTabId);
+  };
+
+  const handleContentChange = (e) => {
+    const newContent = e.target.value;
+    const currentTab = getActiveTab();
+    
+    setTabs(prevTabs => 
+      prevTabs.map(tab => 
+        tab.id === activeTabId 
+          ? { 
+              ...tab, 
+              content: newContent,
+              hasUnsavedChanges: newContent !== '' && newContent !== currentTab?.originalContent
+            }
+          : tab
+      )
+    );
+  };
+
+  const handleTabSelect = (tabId) => {
+    setActiveTabId(tabId);
+  };
+
+  const handleTabClose = (tabId) => {
+    // Prevent closing the last tab
+    if (tabs.length === 1) return;
+
+    setTabs(prevTabs => {
+      const newTabs = prevTabs.filter(tab => tab.id !== tabId);
+      
+      // If we're closing the active tab, switch to another tab
+      if (tabId === activeTabId) {
+        const tabIndex = prevTabs.findIndex(tab => tab.id === tabId);
+        const newActiveTab = newTabs[Math.max(0, tabIndex - 1)];
+        setActiveTabId(newActiveTab.id);
+      }
+      
+      return newTabs;
+    });
+  };
+
+  const handleAddTab = () => {
+    const newTab = {
+      id: nextTabId,
+      title: `Untitled-${nextTabId}`,
+      content: '',
+      hasUnsavedChanges: false
+    };
+    
+    setTabs(prevTabs => [...prevTabs, newTab]);
+    setActiveTabId(nextTabId);
+    setNextTabId(prev => prev + 1);
+  };
+
+  const activeTab = getActiveTab();
+
+  return (
+    <div className="landing-page">
+      <Header 
+        onBackToHome={() => console.log('Back to home clicked')}
+        onNewFile={handleAddTab}
+      />
+      <main className="landing-main">
+        <section className="landing-full-preview">
+          <TabSystem
+            tabs={tabs}
+            activeTabId={activeTabId}
+            onTabSelect={handleTabSelect}
+            onTabClose={handleTabClose}
+            onAddTab={handleAddTab}
+          />
+          <div className="landing-editor-wrap">
+            {activeTab && (
+              <TextEditor
+                content={activeTab.content}
+                onChange={handleContentChange}
+              />
+            )}
           </div>
         </section>
       </main>
     </div>
   );
-};
-
-const styles = {
-  page: {
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    background: '#0f1220',
-    color: '#e7e9ff',
-    fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
-  },
-  // takes all space under the header
-  main: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '12px',
-    minHeight: 0, // Important: allows flex child to shrink
-  },
-  // no maxWidth; use 100%
-  fullPreview: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-    margin: 0,
-    minHeight: 0, // Important: allows flex child to shrink
-  },
-  previewTitle: { 
-    margin: '0 0 10px',
-    fontSize: '14px',
-    color: '#9ca3af',
-  },
-  editorWrap: {
-    flex: 1,
-    border: '1px solid #2a2f55',
-    borderRadius: 12,
-    overflow: 'hidden',
-    display: 'flex',
-    minHeight: 0, // Important: allows child to stretch in flex
-  },
-  // TextEditor container styles
-  textEditorContainer: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-    height: '100%',
-  },
-  textEditor: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    background: '#0f1220',
-    color: '#e7e9ff',
-    border: 'none',
-    outline: 'none',
-    padding: '16px',
-    fontSize: '14px',
-    fontFamily: 'Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-    lineHeight: '1.5',
-    resize: 'none',
-    boxSizing: 'border-box',
-  },
 };
 
 export default LandingPage;

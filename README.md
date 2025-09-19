@@ -43,10 +43,12 @@ notes-application-blockchain/
 
 *2AM DISCORD DECISIONS*
 
+
 - **Cantiller, Christian Jayson J.** *(Frontend Dev)*
 - **Diva, Justin Andry N.** *(Frontend Dev)*
 - **Lada, Nathan Xander** *(Backend Dev)*
 - **Go, Felix Christian T.** *(Frontend Dev)*
+
 
 ---
 

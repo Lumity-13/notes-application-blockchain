@@ -1,87 +1,93 @@
-import React, { useState } from 'react';
-import FileDropdown from './FileDropdown';
-import EditDropdown from './EditDropdown';
-import AccountDropdown from './AccountDropdown';
-import '../css/Header.css';
+import React, { useState } from "react";
+import FileDropdown from "./FileDropdown";
+import EditDropdown from "./EditDropdown";
+import AccountDropdown from "./AccountDropdown";
+import LoginPopup from "./LoginPopup";
+import RegisterPopup from "./RegisterPopup";
+import { useAuth } from "../context/AuthContext";
 
-const Header = ({ onBackToHome }) => {
-  const [activeDropdown, setActiveDropdown] = useState(null);
+const Header = ({ onBackToHome, onNewFile }) => {
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [showRegisterPopup, setShowRegisterPopup] = useState(false);
 
-  const toggleDropdown = (dropdown) => {
-    console.log('Dropdown button clicked:', dropdown);
-    console.log('Current activeDropdown state:', activeDropdown);
-    
-    const newState = activeDropdown === dropdown ? null : dropdown;
-    console.log('Setting activeDropdown to:', newState);
-    
-    setActiveDropdown(newState);
+  const { user, logout } = useAuth(); // get logged-in user & logout function
+
+  const handleDropdownToggle = (dropdownName) => {
+    setOpenDropdown(openDropdown === dropdownName ? null : dropdownName);
   };
+  const closeDropdowns = () => setOpenDropdown(null);
 
-  const closeDropdowns = () => {
-    console.log('Closing all dropdowns');
-    setActiveDropdown(null);
-  };
+  const handleLoginClick = () => { setShowLoginPopup(true); closeDropdowns(); };
+  const handleRegisterClick = () => { setShowRegisterPopup(true); closeDropdowns(); };
+  const handleCloseLogin = () => setShowLoginPopup(false);
+  const handleCloseRegister = () => setShowRegisterPopup(false);
+  const handleSwitchToRegister = () => { setShowLoginPopup(false); setShowRegisterPopup(true); };
+  const handleSwitchToLogin = () => { setShowRegisterPopup(false); setShowLoginPopup(true); };
+
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      const header = document.querySelector(".header");
+      if (header && !header.contains(event.target)) closeDropdowns();
+    };
+    if (openDropdown) {
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }
+  }, [openDropdown]);
 
   return (
-    <header className="header">
-      <div className="left-section">
-        <button 
-          className="home-button"
-          onClick={() => {
-            console.log('Home button clicked');
-            onBackToHome();
-          }} 
-          title="Back to Home"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-          </svg>
-        </button>
-        
+    <>
+      <header className="header">
         <div className="menu-bar">
           <div className="menu-item">
-            <button 
-              className="menu-button"
-              onClick={() => toggleDropdown('file')}
-            >
+            <button className="menu-button"
+              onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleDropdownToggle("file"); }}>
               File
             </button>
-            <FileDropdown 
-              isOpen={activeDropdown === 'file'}
-              onClose={closeDropdowns}
-            />
+            <FileDropdown isOpen={openDropdown === "file"} onClose={closeDropdowns} onNewFile={onNewFile} />
           </div>
-          
+
           <div className="menu-item">
-            <button 
-              className="menu-button"
-              onClick={() => toggleDropdown('edit')}
-            >
+            <button className="menu-button"
+              onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleDropdownToggle("edit"); }}>
               Edit
             </button>
-            <EditDropdown 
-              isOpen={activeDropdown === 'edit'}
-              onClose={closeDropdowns}
-            />
+            <EditDropdown isOpen={openDropdown === "edit"} onClose={closeDropdowns} />
           </div>
         </div>
-      </div>
 
-      <div className="account-section">
-        <button 
-          className="account-button"
-          onClick={() => toggleDropdown('account')}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-          </svg>
-        </button>
-        <AccountDropdown 
-          isOpen={activeDropdown === 'account'}
-          onClose={closeDropdowns}
-        />
-      </div>
-    </header>
+        <div className="account-section" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+          {/* Username displayed beside the icon */}
+          {user && (
+            <span style={{ fontWeight: 500 }}>{user.username}</span>
+          )}
+
+          {/* Account dropdown button */}
+          <button className="account-button"
+            onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleDropdownToggle("account"); }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+
+          {/* AccountDropdown changes if logged in */}
+          <AccountDropdown
+            isOpen={openDropdown === "account"}
+            onClose={closeDropdowns}
+            onLoginClick={handleLoginClick}
+            onRegisterClick={handleRegisterClick}
+            user={user} // pass user so we can change dropdown items
+            logout={logout} // logout callback
+          />
+        </div>
+      </header>
+
+      {/* Auth Popups */}
+      <LoginPopup isOpen={showLoginPopup} onClose={handleCloseLogin} onSwitchToRegister={handleSwitchToRegister} />
+      <RegisterPopup isOpen={showRegisterPopup} onClose={handleCloseRegister} onSwitchToLogin={handleSwitchToLogin} />
+    </>
   );
 };
 

@@ -10,8 +10,15 @@ const EditDropdown = ({ isOpen, onClose }) => {
   ];
 
   const handleItemClick = (option) => {
-    console.log('Edit option clicked:', option);
-    onClose();
+    if (!option.includes('---')) {
+      console.log('Edit option clicked:', option);
+      onClose();
+    }
+  };
+
+  const handleMouseDown = (e, option) => {
+    e.preventDefault(); // Prevent focus change and selection loss
+    handleItemClick(option);
   };
 
   if (!isOpen) return null;
@@ -22,7 +29,7 @@ const EditDropdown = ({ isOpen, onClose }) => {
         <div 
           key={index}
           className={`dropdown-item ${option.includes('---') ? 'placeholder' : ''}`}
-          onClick={() => !option.includes('---') && handleItemClick(option)}
+          onMouseDown={(e) => handleMouseDown(e, option)}
         >
           {option}
         </div>

@@ -1,17 +1,27 @@
 import React from 'react';
 
-const FileDropdown = ({ isOpen, onClose }) => {
+const FileDropdown = ({ isOpen, onClose, onNewFile }) => {
   const fileOptions = [
     'New File',
-    'Open File',
-    'Save',
-    'Save As',
     '--- More options coming soon ---'
   ];
 
   const handleItemClick = (option) => {
-    console.log('File option clicked:', option);
-    onClose();
+    if (!option.includes('---')) {
+      console.log('File option clicked:', option);
+      
+      // Handle specific file options
+      if (option === 'New File' && onNewFile) {
+        onNewFile();
+      }
+      
+      onClose();
+    }
+  };
+
+  const handleMouseDown = (e, option) => {
+    e.preventDefault(); // Prevent focus change and selection loss
+    handleItemClick(option);
   };
 
   if (!isOpen) return null;
@@ -22,7 +32,7 @@ const FileDropdown = ({ isOpen, onClose }) => {
         <div 
           key={index}
           className={`dropdown-item ${option.includes('---') ? 'placeholder' : ''}`}
-          onClick={() => !option.includes('---') && handleItemClick(option)}
+          onMouseDown={(e) => handleMouseDown(e, option)}
         >
           {option}
         </div>
