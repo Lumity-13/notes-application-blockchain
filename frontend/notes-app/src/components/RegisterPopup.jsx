@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import '../css/AuthPopup.css';
+import { registerUser } from "../api/users.js";
+
 
 const RegisterPopup = ({ isOpen, onClose, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
@@ -59,13 +61,21 @@ const RegisterPopup = ({ isOpen, onClose, onSwitchToLogin }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      console.log('Registration attempt:', formData);
-      // Add your registration logic here
-    }
-  };
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!validateForm()) return;
+
+  try {
+    const { username, email, password } = formData;
+    await registerUser({ username, email, password });   // POST /users
+    // Per your instruction: after successful register, switch to Login popup
+    onSwitchToLogin();
+  } catch (err) {
+    console.error(err);
+    const msg = err?.response?.data?.message;
+    alert(msg || "Registration failed");
+  }
+};
 
   const handleGoogleRegister = () => {
     console.log('Google register clicked');

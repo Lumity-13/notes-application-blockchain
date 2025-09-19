@@ -1,31 +1,59 @@
+// src/components/LoginPopup.jsx
 import React, { useState } from 'react';
 import '../css/AuthPopup.css';
+import { listUsers } from "../api/users";
+import { useAuth } from "../context/AuthContext";
 
 const LoginPopup = ({ isOpen, onClose, onSwitchToRegister }) => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
-  const [rememberMe, setRememberMe] = useState(false);
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [rememberMe, setRememberMe] = useState(false); // kept for UI; persistence handled by AuthContext
   const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const { login } = useAuth();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login attempt:', formData);
-    // Add your login logic here
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await listUsers(); // GET /users
+      const users = Array.isArray(res.data) ? res.data : [];
+
+      const match = users.find(u =>
+        String(u.email || '').toLowerCase() === String(formData.email).toLowerCase() &&
+        String(u.password || '') === String(formData.password)
+      );
+
+      if (!match) {
+        alert('Invalid email or password');
+        return;
+      }
+
+      // Persist via AuthContext (writes to localStorage)
+      login({
+        id: match.userId ?? match.id,
+        username: match.username,
+        email: match.email,
+      });
+
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert('Login failed. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleGoogleLogin = () => {
     console.log('Google login clicked');
-    // Add Google OAuth logic here
+    // Placeholder for future OAuth flow
   };
 
   if (!isOpen) return null;
@@ -34,7 +62,7 @@ const LoginPopup = ({ isOpen, onClose, onSwitchToRegister }) => {
     <div className="auth-overlay" onClick={onClose}>
       <div className="auth-popup" onClick={(e) => e.stopPropagation()}>
         <button className="auth-close-btn" onClick={onClose}>×</button>
-        
+
         <div className="auth-header">
           <div className="auth-logo">
             <div className="auth-avatar">
@@ -65,6 +93,7 @@ const LoginPopup = ({ isOpen, onClose, onSwitchToRegister }) => {
                 onChange={handleInputChange}
                 className="auth-input"
                 required
+                autoComplete="email"
               />
             </label>
           </div>
@@ -83,11 +112,13 @@ const LoginPopup = ({ isOpen, onClose, onSwitchToRegister }) => {
                 onChange={handleInputChange}
                 className="auth-input"
                 required
+                autoComplete="current-password"
               />
               <button
                 type="button"
                 className="auth-password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   {showPassword ? (
@@ -117,8 +148,8 @@ const LoginPopup = ({ isOpen, onClose, onSwitchToRegister }) => {
             </button>
           </div>
 
-          <button type="submit" className="auth-submit-btn">
-            Login
+          <button type="submit" className="auth-submit-btn" disabled={submitting}>
+            {submitting ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
@@ -137,9 +168,9 @@ const LoginPopup = ({ isOpen, onClose, onSwitchToRegister }) => {
         </button> */}
 
         <div className="auth-switch">
-          Not a member? 
-          <button 
-            type="button" 
+          Not a member?{" "}
+          <button
+            type="button"
             className="auth-switch-link"
             onClick={onSwitchToRegister}
           >
