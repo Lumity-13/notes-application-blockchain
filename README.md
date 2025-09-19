@@ -112,6 +112,8 @@ SELECT * FROM users;
 SELECT * FROM notes;
 SELECT * FROM blockchain_ledger;
 ```
+`Note: When you run multiple SELECTs, pgAdmin usually shows results of the last query only (blockchain_ledger).
+That’s why you’re only seeing that table in the Data Output.`
 
 ### 3. Launch Backend
 ```bash
@@ -171,6 +173,20 @@ GET http://localhost:8080/blocks/validate
 ---
 
 ## Development Utilities
+
+## Database rows check
+```sql
+-- Users Table
+SELECT * FROM users;
+```
+```sql
+-- Notes Table
+SELECT * FROM notes;
+```
+```sql
+-- Blockchain Ledger Table
+SELECT * FROM blockchain_ledger;
+```
 
 ### Database Reset (Development Only)
 ```sql
