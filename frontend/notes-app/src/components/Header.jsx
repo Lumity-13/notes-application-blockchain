@@ -5,7 +5,7 @@ import AccountDropdown from './AccountDropdown';
 import LoginPopup from './LoginPopup';
 import RegisterPopup from './RegisterPopup';
 
-const Header = ({ onBackToHome }) => {
+const Header = ({ onBackToHome, onNewFile }) => {
   // Existing state for dropdowns
   const [openDropdown, setOpenDropdown] = useState(null);
   
@@ -53,8 +53,12 @@ const Header = ({ onBackToHome }) => {
 
   // Close dropdowns when clicking outside
   React.useEffect(() => {
-    const handleClickOutside = () => {
-      closeDropdowns();
+    const handleClickOutside = (event) => {
+      // Check if the click is outside the header area
+      const header = document.querySelector('.header');
+      if (header && !header.contains(event.target)) {
+        closeDropdowns();
+      }
     };
 
     if (openDropdown) {
@@ -70,7 +74,8 @@ const Header = ({ onBackToHome }) => {
           <div className="menu-item">
             <button 
               className="menu-button"
-              onClick={(e) => {
+              onMouseDown={(e) => {
+                e.preventDefault(); // Prevent focus change
                 e.stopPropagation();
                 handleDropdownToggle('file');
               }}
@@ -80,13 +85,15 @@ const Header = ({ onBackToHome }) => {
             <FileDropdown
               isOpen={openDropdown === 'file'}
               onClose={closeDropdowns}
+              onNewFile={onNewFile}
             />
           </div>
 
           <div className="menu-item">
             <button 
               className="menu-button"
-              onClick={(e) => {
+              onMouseDown={(e) => {
+                e.preventDefault(); // Prevent focus change
                 e.stopPropagation();
                 handleDropdownToggle('edit');
               }}
@@ -103,14 +110,21 @@ const Header = ({ onBackToHome }) => {
         <div className="account-section">
           <button 
             className="account-button"
-            onClick={(e) => {
+            onMouseDown={(e) => {
+              e.preventDefault(); // Prevent focus change
               e.stopPropagation();
               handleDropdownToggle('account');
             }}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-          </svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path 
+                d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
           
           <AccountDropdown

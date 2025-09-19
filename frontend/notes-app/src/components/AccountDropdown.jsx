@@ -12,6 +12,11 @@ const AccountDropdown = ({ isOpen, onClose, onLoginClick, onRegisterClick }) => 
     onClose();
   };
 
+  const handleMouseDown = (e, option) => {
+    e.preventDefault(); // Prevent focus change and selection loss
+    handleItemClick(option);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -20,7 +25,7 @@ const AccountDropdown = ({ isOpen, onClose, onLoginClick, onRegisterClick }) => 
         <div 
           key={index}
           className="dropdown-item"
-          onClick={() => handleItemClick(option)}
+          onMouseDown={(e) => handleMouseDown(e, option)}
         >
           {option.label}
         </div>
