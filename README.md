@@ -20,7 +20,7 @@ This project implements a **decentralized notes application** that integrates fu
 
 | Component | Technology |
 |-----------|------------|
-| **Frontend** | React.js |
+| **Frontend** | React.js + Vite|
 | **Backend** | Spring Boot (Java 21, Maven) |
 | **Database** | PostgreSQL 17.6 |
 | **Version Control** | GitHub |
@@ -41,12 +41,12 @@ notes-application-blockchain/
 
 ## Development Team
 
-*2AM Discord Decision*
+*2AM DISCORD DECISIONS*
 
-- **Cantiller, Christian Jayson J.**
+- **Cantiller, Christian Jayson J.** *(Frontend Dev)*
 - **Diva, Justin Andry N.** *(Frontend Dev)*
-- **Lada, Nathan Xander** *(Backend Lead)*
-- **Go, Felix Christian T.**
+- **Lada, Nathan Xander** *(Backend Dev)*
+- **Go, Felix Christian T.** *(Frontend Dev)*
 
 ---
 
@@ -68,9 +68,13 @@ cd notes-application-blockchain
 
 #### Step 1: Install & Launch PostgreSQL 17.6
 
+`Note: spring.datasource.password=admin`
+
 #### Step 2: Create Database via pgAdmin
-1. Open pgAdmin → PostgreSQL 17 → Right-click "Databases" → Create
-2. Database name: `notes_app`
+1. Open windows search → type in "pgAdmin"
+2. Open pgAdmin → Dropdown Server → Dropdown PostgreSQL 17 → Right-click "Databases" → Create
+3. Database name: `notes_app`
+4. Save
 
 #### Step 3: Initialize Schema
 1. Right-click `notes_app` → Query Tool
@@ -101,7 +105,7 @@ CREATE TABLE blockchain_ledger (
 );
 ```
 
-#### Step 4: Verify Installation
+#### Step 4: Verify the tables
 ```sql
 -- Verify tables exist
 SELECT * FROM users;
@@ -121,7 +125,7 @@ cd backend/
 ```bash
 cd frontend/
 npm install
-npm start
+npm run dev
 ```
 *Client runs on: http://localhost:3000*
 ### WARNING: PLACEHOLDER
