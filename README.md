@@ -6,7 +6,7 @@
 
 ## Overview
 
-This project implements a **decentralized notes application** that integrates fundamental blockchain principles. Each note is cryptographically linked to a blockchain block, creating an immutable ledger that ensures data integrity and demonstrates distributed ledger technology.
+This project implements a **decentralized notes application** that integrates fundamental blockchain principles. Each note is cryptographically linked to a blockchain block, creating an immutable ledger that ensures data integrity and demonstrates distributed ledger technology. It showcases how blockchain can be applied beyond cryptocurrencies by providing a secure and transparent way to store and manage personal notes. Users can create, view, and manage notes while experiencing how each entry becomes part of an immutable blockchain ledger, ensuring permanent and verifiable recordkeeping.
 
 ### Key Features
 - Cryptographic hash linking between blocks
@@ -20,7 +20,7 @@ This project implements a **decentralized notes application** that integrates fu
 
 | Component | Technology |
 |-----------|------------|
-| **Frontend** | React.js |
+| **Frontend** | React.js + Vite|
 | **Backend** | Spring Boot (Java 21, Maven) |
 | **Database** | PostgreSQL 17.6 |
 | **Version Control** | GitHub |
@@ -41,12 +41,14 @@ notes-application-blockchain/
 
 ## Development Team
 
-*2AM Discord Decision*
+*2AM DISCORD DECISIONS*
 
-- **Cantiller, Christian Jayson J.** *(Frontend)
-- **Diva, Justin Andry N.**  
-- **Lada, Nathan Xander** *(Backend Lead)*
-- **Go, Felix Christian T.**
+
+- **Cantiller, Christian Jayson J.** *(Frontend Dev)*
+- **Diva, Justin Andry N.** *(Frontend Dev)*
+- **Lada, Nathan Xander** *(Backend Dev)*
+- **Go, Felix Christian T.** *(Frontend Dev)*
+
 
 ---
 
@@ -68,9 +70,13 @@ cd notes-application-blockchain
 
 #### Step 1: Install & Launch PostgreSQL 17.6
 
+`Note: spring.datasource.password=admin`
+
 #### Step 2: Create Database via pgAdmin
-1. Open pgAdmin → PostgreSQL 17 → Right-click "Databases" → Create
-2. Database name: `notes_app`
+1. Open windows search → type in "pgAdmin"
+2. Open pgAdmin → Dropdown Server → Dropdown PostgreSQL 17 → Right-click "Databases" → Create
+3. Database name: `notes_app`
+4. Save
 
 #### Step 3: Initialize Schema
 1. Right-click `notes_app` → Query Tool
@@ -101,13 +107,15 @@ CREATE TABLE blockchain_ledger (
 );
 ```
 
-#### Step 4: Verify Installation
+#### Step 4: Verify the tables
 ```sql
 -- Verify tables exist
 SELECT * FROM users;
 SELECT * FROM notes;
 SELECT * FROM blockchain_ledger;
 ```
+`Note: When you run multiple SELECTs, pgAdmin usually shows results of the last query only (blockchain_ledger).
+That’s why you’re only seeing that table in the Data Output.`
 
 ### 3. Launch Backend
 ```bash
@@ -121,7 +129,7 @@ cd backend/
 ```bash
 cd frontend/
 npm install
-npm start
+npm run dev
 ```
 *Client runs on: http://localhost:3000*
 ### WARNING: PLACEHOLDER
@@ -167,6 +175,20 @@ GET http://localhost:8080/blocks/validate
 ---
 
 ## Development Utilities
+
+## Database rows check
+```sql
+-- Users Table
+SELECT * FROM users;
+```
+```sql
+-- Notes Table
+SELECT * FROM notes;
+```
+```sql
+-- Blockchain Ledger Table
+SELECT * FROM blockchain_ledger;
+```
 
 ### Database Reset (Development Only)
 ```sql
