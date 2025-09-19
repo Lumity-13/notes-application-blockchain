@@ -43,7 +43,7 @@ notes-application-blockchain/
 
 *2AM Discord Decision*
 
-- **Cantiller, Christian Jayson J.**
+- **Cantiller, Christian Jayson J.** *(Frontend)
 - **Diva, Justin Andry N.**  
 - **Lada, Nathan Xander** *(Backend Lead)*
 - **Go, Felix Christian T.**
