@@ -3,9 +3,6 @@ import React from 'react';
 const FileDropdown = ({ isOpen, onClose }) => {
   const fileOptions = [
     'New File',
-    'Open File',
-    'Save',
-    'Save As',
     '--- More options coming soon ---'
   ];
 

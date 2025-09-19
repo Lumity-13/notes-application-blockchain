@@ -1,13 +1,14 @@
 import React from 'react';
 
-const AccountDropdown = ({ isOpen, onClose }) => {
+const AccountDropdown = ({ isOpen, onClose, onLoginClick, onRegisterClick }) => {
   const accountOptions = [
-    'Login',
-    'Register'
+    { label: 'Login', action: onLoginClick },
+    { label: 'Register', action: onRegisterClick }
   ];
 
   const handleItemClick = (option) => {
-    console.log('Account option clicked:', option);
+    console.log('Account option clicked:', option.label);
+    option.action();
     onClose();
   };
 
@@ -21,7 +22,7 @@ const AccountDropdown = ({ isOpen, onClose }) => {
           className="dropdown-item"
           onClick={() => handleItemClick(option)}
         >
-          {option}
+          {option.label}
         </div>
       ))}
     </div>
