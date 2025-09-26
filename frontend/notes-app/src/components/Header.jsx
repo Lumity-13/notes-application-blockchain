@@ -5,8 +5,9 @@ import AccountDropdown from "./AccountDropdown";
 import LoginPopup from "./LoginPopup";
 import RegisterPopup from "./RegisterPopup";
 import { useAuth } from "../context/AuthContext";
+import '../css/LandingPage.css';
 
-const Header = ({ onBackToHome, onNewFile }) => {
+const Header = ({ onBackToHome, onNewFile, onFindReplaceClick, editorRef }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [showRegisterPopup, setShowRegisterPopup] = useState(false);
@@ -53,7 +54,12 @@ const Header = ({ onBackToHome, onNewFile }) => {
               onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleDropdownToggle("edit"); }}>
               Edit
             </button>
-            <EditDropdown isOpen={openDropdown === "edit"} onClose={closeDropdowns} />
+            <EditDropdown 
+            isOpen={openDropdown === "edit"} 
+            onClose={closeDropdowns}
+            editorRef={{editorRef}}
+            onFindReplaceClick={onFindReplaceClick} 
+            />
           </div>
         </div>
 
