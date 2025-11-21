@@ -1,18 +1,20 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import FileDropdown from "./FileDropdown";
 import EditDropdown from "./EditDropdown";
 import AccountDropdown from "./AccountDropdown";
 import LoginPopup from "./LoginPopup";
 import RegisterPopup from "./RegisterPopup";
 import { useAuth } from "../context/AuthContext";
-import '../css/LandingPage.css';
+import '../css/Header.css';
 
 const Header = ({ onBackToHome, onNewFile, onFindReplaceClick, editorRef }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [showRegisterPopup, setShowRegisterPopup] = useState(false);
 
-  const { user, logout } = useAuth(); // get logged-in user & logout function
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleDropdownToggle = (dropdownName) => {
     setOpenDropdown(openDropdown === dropdownName ? null : dropdownName);
@@ -41,6 +43,25 @@ const Header = ({ onBackToHome, onNewFile, onFindReplaceClick, editorRef }) => {
     <>
       <header className="header">
         <div className="menu-bar">
+          <button
+            onClick={() => navigate("/")}
+            className="back-btn"
+            style={{
+              background: "#1a1f3a",
+              color: "#e7e9ff",
+              border: "none",
+              borderRadius: "6px",
+              padding: "8px 18px",
+              cursor: "pointer",
+              fontWeight: 500,
+              fontSize: "0.9rem",
+              boxShadow: "0 2px 8px rgba(44,46,76,0.09)",
+              marginRight: "12px"
+            }}
+          >
+            ← Back
+          </button>
+
           <div className="menu-item">
             <button className="menu-button"
               onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleDropdownToggle("file"); }}>
@@ -54,22 +75,19 @@ const Header = ({ onBackToHome, onNewFile, onFindReplaceClick, editorRef }) => {
               onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleDropdownToggle("edit"); }}>
               Edit
             </button>
-            <EditDropdown 
-            isOpen={openDropdown === "edit"} 
-            onClose={closeDropdowns}
-            editorRef={{editorRef}}
-            onFindReplaceClick={onFindReplaceClick} 
+            <EditDropdown
+              isOpen={openDropdown === "edit"}
+              onClose={closeDropdowns}
+              editorRef={{ editorRef }}
+              onFindReplaceClick={onFindReplaceClick}
             />
           </div>
         </div>
 
         <div className="account-section" style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-          {/* Username displayed beside the icon */}
           {user && (
             <span style={{ fontWeight: 500 }}>{user.username}</span>
           )}
-
-          {/* Account dropdown button */}
           <button className="account-button"
             onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleDropdownToggle("account"); }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -77,20 +95,16 @@ const Header = ({ onBackToHome, onNewFile, onFindReplaceClick, editorRef }) => {
                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-
-          {/* AccountDropdown changes if logged in */}
           <AccountDropdown
             isOpen={openDropdown === "account"}
             onClose={closeDropdowns}
             onLoginClick={handleLoginClick}
             onRegisterClick={handleRegisterClick}
-            user={user} // pass user so we can change dropdown items
-            logout={logout} // logout callback
+            user={user}
+            logout={logout}
           />
         </div>
       </header>
-
-      {/* Auth Popups */}
       <LoginPopup isOpen={showLoginPopup} onClose={handleCloseLogin} onSwitchToRegister={handleSwitchToRegister} />
       <RegisterPopup isOpen={showRegisterPopup} onClose={handleCloseRegister} onSwitchToLogin={handleSwitchToLogin} />
     </>

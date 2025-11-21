@@ -1,9 +1,16 @@
-// src/App.jsx
-import React from 'react';
-import LandingPage from './pages/LandingPage'; // adjust path if needed
-import Dashboard from './pages/Dashboard'; // adjust path if needed
-import './App.css'; // optional
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Landing from "./pages/Landing";
+import NotesPage from "./pages/NotesPage";
 
 export default function App() {
-  return <Dashboard />;
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Landing />} />         {/* Home/Landing page */}
+        <Route path="/notes" element={<NotesPage />} />  {/* Notes page */}
+      </Routes>
+    </Router>
+  );
 }

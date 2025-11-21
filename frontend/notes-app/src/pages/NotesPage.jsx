@@ -2,24 +2,9 @@ import React, { useState, useRef } from 'react';
 import Header from '../components/Header';
 import TabSystem from '../components/TabSystem';
 import FindReplaceModal from '../components/FindReplaceModal';
-import '../css/LandingPage.css';
+import '../css/NotesPage.css'; // This should have your header/menu styles
 
-const TextEditor = ({ content, onChange, editorRef }) => {
-  return (
-    <div className="landing-text-editor-container">
-      <textarea
-        ref={editorRef}
-        className="landing-text-editor"
-        value={content}
-        onChange={onChange}
-        placeholder="Start typing your notes here..."
-        spellCheck="false"
-      />
-    </div>
-  );
-};
-
-const LandingPage = () => {
+const NotesPage = () => {
   const [tabs, setTabs] = useState([
     { id: 1, title: 'Untitled-1', content: '', hasUnsavedChanges: false }
   ]);
@@ -29,8 +14,10 @@ const LandingPage = () => {
 
   const editorRef = useRef(null);
 
+  // Helpers
   const getActiveTab = () => tabs.find(tab => tab.id === activeTabId);
 
+  // Tab actions
   const handleContentChange = (e) => {
     const newContent = e.target.value;
     setTabs(prevTabs =>
@@ -82,12 +69,15 @@ const LandingPage = () => {
 
   return (
     <div className="landing-page">
+      {/* Header with logo */}
       <Header
         onBackToHome={() => console.log('Back to home clicked')}
         onNewFile={handleAddTab}
         onFindReplaceClick={() => setIsFindReplaceOpen(true)}
         editorRef={editorRef}
       />
+
+      {/* Main layout */}
       <main className="landing-main">
         <section className="landing-full-preview">
           <TabSystem
@@ -99,11 +89,16 @@ const LandingPage = () => {
           />
           <div className="landing-editor-wrap">
             {activeTab && (
-              <TextEditor
-                content={activeTab.content}
-                onChange={handleContentChange}
-                editorRef={editorRef}
-              />
+              <div className="landing-text-editor-container">
+                <textarea
+                  ref={editorRef}
+                  className="landing-text-editor"
+                  value={activeTab.content}
+                  onChange={handleContentChange}
+                  placeholder="Start typing your notes here..."
+                  spellCheck="false"
+                />
+              </div>
             )}
           </div>
         </section>
@@ -119,4 +114,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default NotesPage;
