@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../css/Landing.css";
 
-// Import your Wallet component
+import { useAuth } from "../context/AuthContext";
+
 import Wallet from "./Wallet";
+import Profile from "./Profile";
 
 const Landing = () => {
     const [openDropdown, setOpenDropdown] = useState(false);
+    const [activeTab, setActiveTab] = useState("notes"); // notes | wallet | profile
 
-    // Which section to show on right side
-    const [activeSection, setActiveSection] = useState("notes");
+    const { user, logout } = useAuth();   // <-- includes token remover
+    const navigate = useNavigate();
 
     const handleDropdownToggle = () => {
         setOpenDropdown(!openDropdown);
@@ -25,14 +29,23 @@ const Landing = () => {
     }, [openDropdown]);
 
     const notes = [
-        { id: 1, title: "Test", date: "12/12/2021", text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...", color: "#fef08a" },
-        { id: 2, title: "Mid test exam", date: "12/12/2021", text: "Ultrices viverra odio congue lecos felis...", color: "#fecaca" },
-        { id: 3, title: "Jonas's notes", date: "12/12/2021", text: "Rokity viverra odio congue lecos felis...", color: "#bfdbfe" }
+        { id: 1, title: "Test", date: "12/12/2021", text: "Lorem ipsum dolor sit amet...", color: "#fef08a" },
+        { id: 2, title: "Mid test exam", date: "12/12/2021", text: "Ultrices viverra odio congue...", color: "#fecaca" },
+        { id: 3, title: "Jonas's notes", date: "12/12/2021", text: "Rokity viverra odio congue...", color: "#bfdbfe" }
     ];
+
+    // ================================
+    // LOGOUT HANDLER
+    // Clears token + user data
+    // Redirects to login
+    // ================================
+    const handleLogout = () => {
+        logout();   // clears token + user from AuthContext & localStorage
+        navigate("/login", { replace: true });
+    };
 
     return (
         <div className="dashboard">
-
             {/* Sidebar */}
             <aside className="sidebar">
 
@@ -67,9 +80,9 @@ const Landing = () => {
 
                 {/* Navigation */}
                 <nav className="nav">
-                    <button 
-                        className={`navItem ${activeSection === "notes" ? "navItemActive" : ""}`}
-                        onClick={() => setActiveSection("notes")}
+                    <button
+                        className={`navItem ${activeTab === "notes" ? "navItemActive" : ""}`}
+                        onClick={() => setActiveTab("notes")}
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <rect x="3" y="3" width="7" height="7" stroke="currentColor" strokeWidth="2" />
@@ -80,9 +93,9 @@ const Landing = () => {
                         <span>Notes</span>
                     </button>
 
-                    <button 
-                        className={`navItem ${activeSection === "wallet" ? "navItemActive" : ""}`}
-                        onClick={() => setActiveSection("wallet")}
+                    <button
+                        className={`navItem ${activeTab === "wallet" ? "navItemActive" : ""}`}
+                        onClick={() => setActiveTab("wallet")}
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                             <rect x="2" y="7" width="20" height="14" rx="2"
@@ -90,27 +103,32 @@ const Landing = () => {
                             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"
                                   stroke="currentColor" strokeWidth="2"/>
                         </svg>
-                        <span>Wallets</span>
+                        <span>Wallet</span>
+                    </button>
+
+                    <button
+                        className={`navItem ${activeTab === "profile" ? "navItemActive" : ""}`}
+                        onClick={() => setActiveTab("profile")}
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5z" stroke="currentColor" strokeWidth="2"/>
+                            <path d="M3 21a9 9 0 0 1 18 0" stroke="currentColor" strokeWidth="2"/>
+                        </svg>
+                        <span>Profile</span>
                     </button>
                 </nav>
 
-                {/* Bottom Section */}
+                {/* Bottom */}
                 <div className="sidebarBottom">
-                    <button className="loginButton" onClick={() => window.location.href = "/login"}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"
-                                  stroke="currentColor" strokeWidth="2"
-                                  strokeLinecap="round"/>
-                        </svg>
+                    <button className="loginButton" onClick={handleLogout}>
                         <span>Logout</span>
                     </button>
                 </div>
             </aside>
 
-            {/* MAIN RIGHT SIDE CONTENT */}
+            {/* MAIN CONTENT */}
             <main className="main">
-
-                {activeSection === "notes" && (
+                {activeTab === "notes" && (
                     <section className="notesSection">
                         <h2 className="sectionTitle">My Notes</h2>
 
@@ -129,12 +147,17 @@ const Landing = () => {
                     </section>
                 )}
 
-                {activeSection === "wallet" && (
-                    <div className="walletSection">
+                {activeTab === "wallet" && (
+                    <div className="walletContainer">
                         <Wallet />
                     </div>
                 )}
 
+                {activeTab === "profile" && (
+                    <div className="profileContainer">
+                        <Profile />
+                    </div>
+                )}
             </main>
         </div>
     );

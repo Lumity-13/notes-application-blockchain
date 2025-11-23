@@ -1,26 +1,37 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+// src/context/AuthContext.jsx
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [auth, setAuth] = useState(() => {
-    try {
-      const saved = localStorage.getItem("notesapp_auth");
-      return saved ? JSON.parse(saved) : { user: null };
-    } catch {
-      return { user: null };
-    }
-  });
+  const [user, setUser] = useState(null);
 
+  // Load user from localStorage on refresh
   useEffect(() => {
-    localStorage.setItem("notesapp_auth", JSON.stringify(auth));
-  }, [auth]);
+    const stored = localStorage.getItem("user");
+    if (stored) setUser(JSON.parse(stored));
+  }, []);
 
-  const login = (user) => setAuth({ user });
-  const logout = () => setAuth({ user: null });
+  const login = (data) => {
+    const mapped = {
+      id: data.id || data.userId || data.user_id,   // <--- FIX HERE
+      username: data.username,
+      email: data.email,
+      avatarUrl: data.avatarUrl,
+      token: data.token,
+    };
+
+    setUser(mapped);
+    localStorage.setItem("user", JSON.stringify(mapped));
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+  };
 
   return (
-    <AuthContext.Provider value={{ ...auth, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
