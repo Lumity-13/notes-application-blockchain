@@ -20,8 +20,6 @@ public class User {
     @Column(nullable = false, length = 200)
     private String password;
 
-    @Column(name = "avatar_url")
-    private String avatarUrl;
 
 
     // --- Constructors ---
