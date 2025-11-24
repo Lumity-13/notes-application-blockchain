@@ -1,3 +1,7 @@
+// FIX: Always expose Buffer in lazy loaded modules
+import { Buffer as BufferPolyfill } from "buffer/";
+window.Buffer = BufferPolyfill;
+
 // Wallet.jsx — Simplified version for Blaze SDK 0.1.7
 import React, { useState, useEffect, useMemo } from "react";
 import { Blockfrost, WebWallet, Blaze, Core } from "@blaze-cardano/sdk";
