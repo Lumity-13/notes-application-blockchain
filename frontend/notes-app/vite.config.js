@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   define: {
     global: "globalThis",
-    "process.env": {}, // avoid errors from libraries checking process.env
+    "process.env": {},
   },
   resolve: {
     alias: {
@@ -16,10 +16,14 @@ export default defineConfig({
       stream: "stream-browserify",
       util: "util/",
       events: "events/",
+      // ADD THESE:
+      fs: "memfs",
+      net: "net-browserify",
     },
   },
   optimizeDeps: {
     include: ["buffer", "process", "events"],
+    exclude: ["lucid-cardano"], // ADD THIS
     esbuildOptions: {
       define: {
         global: "globalThis",
