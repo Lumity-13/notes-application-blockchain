@@ -68,7 +68,7 @@ export default function Profile() {
         username,
         email,
         password: password || null,
-        avatarUrl: avatarUrl || null,
+        avatar_url: avatarUrl || null,
       };
 
       // update in backend
