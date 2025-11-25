@@ -10,6 +10,7 @@ import { useAuth } from "./context/AuthContext";
 
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import NotesPage from "./pages/NotesPage";
 import Profile from "./pages/Profile";
 
@@ -24,7 +25,7 @@ function PrivateRoute({ children }) {
 }
 
 // =============================
-// Public Route (block login page if logged in)
+// Public Route (block login/register page if logged in)
 // =============================
 function PublicRoute({ children }) {
   const { user } = useAuth();
@@ -45,6 +46,16 @@ export default function App() {
           element={
             <PublicRoute>
               <Login />
+            </PublicRoute>
+          }
+        />
+
+        {/* REGISTER PAGE (public only) */}
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <Register />
             </PublicRoute>
           }
         />

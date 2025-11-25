@@ -1,5 +1,6 @@
-/* Container */
-.login-container {
+/* Register.css */
+
+.register-container {
     display: flex;
     height: 100vh;
     width: 100vw;
@@ -8,7 +9,7 @@
 }
 
 /* Left Side - Form */
-.login-left {
+.register-left {
     flex: 1;
     display: flex;
     align-items: center;
@@ -17,38 +18,38 @@
     padding: 40px;
 }
 
-.login-form-wrapper {
+.register-form-wrapper {
     width: 100%;
     max-width: 420px;
 }
 
 /* Header */
-.login-header {
+.register-header {
     text-align: center;
     margin-bottom: 32px;
 }
 
-.login-logo {
+.register-logo {
     display: flex;
     justify-content: center;
     margin-bottom: 16px;
 }
 
-.login-title {
+.register-title {
     font-size: 28px;
     font-weight: 700;
     color: #1f2937;
     margin: 0 0 8px 0;
 }
 
-.login-subtitle {
+.register-subtitle {
     font-size: 14px;
     color: #6b7280;
     margin: 0;
 }
 
 /* Form */
-.login-form {
+.register-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -78,11 +79,10 @@
     border: 1.5px solid #e5e7eb;
     border-radius: 8px;
     font-size: 14px;
-    color: #000000;
     outline: none;
     transition: all 0.2s;
     background: white;
-     color: #1f2937;
+    color: #1f2937;
 }
 
 .input-field:focus {
@@ -92,6 +92,20 @@
 
 .input-field::placeholder {
     color: #9ca3af;
+}
+
+.input-field.error {
+    border-color: #ef4444;
+}
+
+.input-field.error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.error-text {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 4px;
 }
 
 .password-toggle {
@@ -109,46 +123,6 @@
 
 .password-toggle:hover {
     color: #6366f1;
-}
-
-/* Options */
-.login-options {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: #6b7280;
-    cursor: pointer;
-    user-select: none;
-}
-
-.checkbox-label input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    accent-color: #6366f1;
-}
-
-.forgot-link {
-    background: transparent;
-    border: none;
-    color: #6366f1;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0;
-    transition: color 0.2s;
-}
-
-.forgot-link:hover {
-    color: #4f46e5;
-    text-decoration: underline;
 }
 
 /* Submit Button */
@@ -181,8 +155,8 @@
     cursor: not-allowed;
 }
 
-/* Switch to Register */
-.login-switch {
+/* Switch to Login */
+.register-switch {
     text-align: center;
     margin-top: 24px;
     font-size: 14px;
@@ -205,7 +179,7 @@
 }
 
 /* Right Side - Hero */
-.login-right {
+.register-right {
     flex: 1;
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     display: flex;
@@ -216,7 +190,7 @@
     overflow: hidden;
 }
 
-.login-right::before {
+.register-right::before {
     content: '';
     position: absolute;
     width: 500px;
@@ -227,7 +201,7 @@
     right: -200px;
 }
 
-.login-right::after {
+.register-right::after {
     content: '';
     position: absolute;
     width: 400px;
@@ -279,25 +253,25 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-    .login-right {
+    .register-right {
         display: none;
     }
     
-    .login-left {
+    .register-left {
         flex: 1;
     }
 }
 
 @media (max-width: 640px) {
-    .login-left {
+    .register-left {
         padding: 24px;
     }
     
-    .login-form-wrapper {
+    .register-form-wrapper {
         max-width: 100%;
     }
     
-    .login-title {
+    .register-title {
         font-size: 24px;
     }
 }
