@@ -25,7 +25,6 @@ const Login = () => {
     setSubmitting(true);
 
     try {
-      // ⭐ REAL API LOGIN ⭐
       const res = await api.post("/users/login", {
         email: formData.email,
         password: formData.password,
@@ -33,7 +32,6 @@ const Login = () => {
 
       const user = res.data;
 
-      // Save user into global auth state
       login({
         id: user.user_id || user.userId,
         username: user.username,
@@ -160,7 +158,11 @@ const Login = () => {
             {/* Switch to Register */}
             <div className="login-switch">
               Not a member?{' '}
-              <button type="button" className="switch-link">
+              <button 
+                type="button" 
+                className="switch-link"
+                onClick={() => navigate("/register")}
+              >
                 Create New Account
               </button>
             </div>
