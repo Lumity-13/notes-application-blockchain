@@ -10,11 +10,11 @@
 /* Sidebar */
 .sidebar {
     width: 260px;
-    background: white;
+    background: #1e293b;
     display: flex;
     flex-direction: column;
     padding: 20px;
-    border-right: 1px solid #e5e7eb;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Sidebar Header */
@@ -23,6 +23,7 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 24px;
+    padding-bottom: 16px;
 }
 
 .logoSection {
@@ -35,6 +36,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background: #6366f1;
+    border-radius: 8px;
+    padding: 8px;
+    width: 32px;
+    height: 32px;
+}
+
+.logoIcon svg {
+    width: 20px;
+    height: 20px;
 }
 
 .logoText {
@@ -43,14 +54,14 @@
 }
 
 .logoTitle {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
-    color: #1f2937;
+    color: white;
 }
 
 .logoSubtitle {
-    font-size: 12px;
-    color: #6b7280;
+    font-size: 11px;
+    color: #94a3b8;
 }
 
 /* Search */
@@ -64,23 +75,27 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
+    color: #64748b;
 }
 
 .searchInput {
     width: 100%;
     padding: 10px 12px 10px 38px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
     outline: none;
-    background: #f9fafb;
+    background: #334155;
+    color: white;
     box-sizing: border-box;
 }
 
+.searchInput::placeholder {
+    color: #64748b;
+}
+
 .searchInput:focus {
-    border-color: #6366f1;
-    background: white;
+    background: #475569;
 }
 
 /* Navigation */
@@ -94,7 +109,7 @@
 .navItem {
     background: transparent;
     border: none;
-    color: #6b7280;
+    color: #94a3b8;
     text-align: left;
     padding: 12px 16px;
     cursor: pointer;
@@ -103,12 +118,13 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
 }
 
 .navItem:hover {
-    background: #f3f4f6;
+    background: #334155;
+    color: white;
 }
 
 .navItemActive {
@@ -116,81 +132,74 @@
     color: white !important;
 }
 
-/* Sidebar Bottom */
+/* User Section */
 .sidebarBottom {
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid #334155;
     padding-top: 16px;
     margin-top: 16px;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    align-items: center;
+    gap: 12px;
+}
+
+.userAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #6366f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.userInfo {
+    flex: 1;
+}
+
+.userName {
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.userRole {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
 }
 
 .loginButton {
     background: transparent;
     border: none;
-    color: #6b7280;
-    text-align: left;
-    padding: 12px 16px;
+    color: #94a3b8;
     cursor: pointer;
-    border-radius: 8px;
+    padding: 8px;
+    border-radius: 6px;
     transition: all 0.2s;
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 15px;
+    gap: 8px;
+    font-size: 14px;
     font-weight: 500;
 }
 
 .loginButton:hover {
-    background: #f3f4f6;
+    background: #334155;
+    color: white;
 }
 
-/* Dark Mode Toggle */
-.darkModeToggle {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    color: #6b7280;
-    font-size: 15px;
-    font-weight: 500;
-}
-
-.toggle {
-    width: 40px;
-    height: 22px;
-    background: #e5e7eb;
-    border-radius: 11px;
-    position: relative;
-    margin-left: auto;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.toggle:hover {
-    background: #d1d5db;
-}
-
-.toggleCircle {
-    width: 18px;
-    height: 18px;
-    background: white;
-    border-radius: 50%;
-    position: absolute;
-    left: 2px;
-    top: 2px;
-    transition: transform 0.2s;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* Main */
+/* Main Content */
 .main {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 24px;
+    padding: 32px;
     overflow-y: auto;
+    background: white;
 }
 
 /* Notes Section */
@@ -198,60 +207,73 @@
     flex: 1;
 }
 
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
 .sectionTitle {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
-    margin-bottom: 20px;
-    color: #1f2937;
+    color: #1e293b;
+    margin: 0;
 }
 
 .notesGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
 }
 
 .noteCard {
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    color: #111827;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.2s;
+    border: 1px solid transparent;
 }
 
 .noteCard:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .noteDate {
-    font-size: 12px;
-    color: #6b7280;
+    font-size: 11px;
+    color: #64748b;
     margin-bottom: 8px;
+    font-weight: 500;
 }
 
 .noteTitle {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     margin-bottom: 8px;
-    color: #1f2937;
+    color: #1e293b;
 }
 
 .noteText {
-    font-size: 14px;
-    color: #4b5563;
+    font-size: 13px;
+    color: #64748b;
     line-height: 1.5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 
 .newNote {
     background: white;
-    color: #6b7280;
+    color: #64748b;
     font-weight: 600;
-    font-size: 16px;
-    border: 2px dashed #d1d5db;
+    font-size: 14px;
+    border: 2px dashed #cbd5e1;
     border-radius: 12px;
     cursor: pointer;
     display: flex;
@@ -262,13 +284,66 @@
 }
 
 .newNote:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
-    transform: translateY(-2px);
+    border-color: #6366f1;
+    color: #6366f1;
+    background: #f8f9fc;
 }
 
-.newNote:active {
-    transform: translateY(0);
+/* Note Colors */
+.noteCard.yellow {
+    background: #fef3c7;
+    border-color: #fbbf24;
+}
+
+.noteCard.red {
+    background: #fee2e2;
+    border-color: #f87171;
+}
+
+.noteCard.blue {
+    background: #dbeafe;
+    border-color: #60a5fa;
+}
+
+/* Wallet and Profile Container */
+.walletContainer,
+.profileContainer {
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+}
+
+/* Scrollbar */
+.main::-webkit-scrollbar {
+    width: 6px;
+}
+
+.main::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.main::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.main::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 240px;
+    }
+    
+    .notesGrid {
+        grid-template-columns: 1fr;
+    }
+    
+    .main {
+        padding: 20px;
+    }
 }
 
 /* Reset */
