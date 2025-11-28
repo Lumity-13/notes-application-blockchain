@@ -1,13 +1,7 @@
 package com.notesapp.backend.controller;
 
 import com.notesapp.backend.model.Note;
-import com.notesapp.backend.model.User;
-import com.notesapp.backend.repository.BlockRepository;
-import com.notesapp.backend.repository.NoteRepository;
-import com.notesapp.backend.repository.UserRepository;
-import com.notesapp.backend.util.HashUtil;
-import com.notesapp.backend.model.Block;
-
+import com.notesapp.backend.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,61 +13,73 @@ import java.util.List;
 public class NoteController {
 
     @Autowired
-    private NoteRepository noteRepository;
+    private NoteService noteService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private BlockRepository blockRepository;
-
-    // --- Get all notes ---
+    /**
+     * Get all notes
+     * GET /notes
+     */
     @GetMapping
-    public List<Note> getAllNotes() {
-        return noteRepository.findAll();
+    public ResponseEntity<List<Note>> getAllNotes() {
+        List<Note> notes = noteService.getAllNotes();
+        return ResponseEntity.ok(notes);
     }
 
-    // --- Get all notes by a specific user ---
+    /**
+     * Get all notes by a specific user
+     * GET /notes/user/{userId}
+     */
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Note>> getNotesByUser(@PathVariable Long userId) {
-        return userRepository.findById(userId)
-                .map(user -> ResponseEntity.ok(noteRepository.findByUser(user)))
+        return noteService.getNotesByUserId(userId)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // --- Create note ---
-    @PostMapping("/user/{userId}")
-    public ResponseEntity<Note> createNote(@PathVariable Long userId, @RequestBody Note note) {
-        return userRepository.findById(userId)
-                .map(user -> {
-                    note.setUser(user);
-                    Note savedNote = noteRepository.save(note);
-
-                    // Blockchain step
-                    Block previousBlock = blockRepository.findTopByOrderByBlockIdDesc();
-                    String previousHash = (previousBlock != null) ? previousBlock.getHash() : "0"; // Genesis block if none
-                    String dataToHash = savedNote.getNoteId() 
-                            + savedNote.getContent() 
-                            + savedNote.getUser().getUserId() 
-                            + previousHash;
-                    String newHash = HashUtil.sha256(dataToHash);
-
-                    Block newBlock = new Block(savedNote, previousHash, newHash);
-                    blockRepository.save(newBlock);
-                    blockRepository.save(newBlock);
-
-                    return ResponseEntity.ok(savedNote);
-                }).orElse(ResponseEntity.notFound().build());
+    /**
+     * Get a single note by ID
+     * GET /notes/{id}
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Note> getNoteById(@PathVariable Long id) {
+        return noteService.getNoteById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
+    /**
+     * Create a new note for a user
+     * POST /notes/user/{userId}
+     * Body: { "title": "...", "content": "..." }
+     */
+    @PostMapping("/user/{userId}")
+    public ResponseEntity<Note> createNote(@PathVariable Long userId, @RequestBody Note note) {
+        return noteService.createNote(userId, note)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
-    // --- Delete note ---
+    /**
+     * Update an existing note
+     * PUT /notes/{id}
+     * Body: { "title": "...", "content": "..." }
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Note> updateNote(@PathVariable Long id, @RequestBody Note note) {
+        return noteService.updateNote(id, note)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Delete a note by ID
+     * DELETE /notes/{id}
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNote(@PathVariable Long id) {
-        return noteRepository.findById(id)
-                .map(note -> {
-                    noteRepository.delete(note);
-                    return ResponseEntity.noContent().<Void>build();
-                }).orElse(ResponseEntity.notFound().build());
+        if (noteService.deleteNote(id)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

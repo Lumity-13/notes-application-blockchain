@@ -16,6 +16,17 @@ export default function Profile() {
   );
   const [isSaving, setIsSaving] = useState(false);
 
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (!user?.username) return "U";
+    return user.username.substring(0, 2).toUpperCase();
+  };
+
+  // Check if user has avatar
+  const hasAvatar = () => {
+    return user?.avatarUrl && user.avatarUrl !== "/default-avatar.png";
+  };
+
   // Upload to Cloudinary
   const uploadToCloudinary = async () => {
     if (!avatarFile) return user?.avatarUrl || null;
@@ -97,14 +108,20 @@ export default function Profile() {
         <div className="avatar-banner">
           <div className="avatar-content">
             <div className="avatar-container">
-              <img
-                src={preview}
-                alt="Profile"
-                className="avatar-image"
-                onError={(e) => {
-                  e.target.src = "/default-avatar.png";
-                }}
-              />
+              {hasAvatar() || avatarFile ? (
+                <img
+                  src={preview}
+                  alt="Profile"
+                  className="avatar-image"
+                  onError={(e) => {
+                    e.target.src = "/default-avatar.png";
+                  }}
+                />
+              ) : (
+                <div className="avatar-initials">
+                  {getUserInitials()}
+                </div>
+              )}
               <label className="avatar-overlay">
                 <svg className="camera-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />

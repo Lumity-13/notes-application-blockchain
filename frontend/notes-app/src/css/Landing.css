@@ -132,7 +132,7 @@
     color: white !important;
 }
 
-/* User Section */
+/* User Section - Now Clickable */
 .sidebarBottom {
     border-top: 1px solid #334155;
     padding-top: 16px;
@@ -140,6 +140,15 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 8px;
+    padding: 12px 8px;
+    margin: 16px -8px 0;
+}
+
+.sidebarBottom:hover {
+    background: #334155;
 }
 
 .userAvatar {
@@ -153,6 +162,26 @@
     color: white;
     font-weight: 600;
     font-size: 14px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.userAvatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.userAvatarInitials {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .userInfo {
@@ -185,10 +214,11 @@
     gap: 8px;
     font-size: 14px;
     font-weight: 500;
+    flex-shrink: 0;
 }
 
 .loginButton:hover {
-    background: #334155;
+    background: #475569;
     color: white;
 }
 

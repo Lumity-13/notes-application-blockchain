@@ -39,10 +39,19 @@ const Landing = () => {
         navigate("/login", { replace: true });
     };
 
+    const handleProfileClick = () => {
+        setActiveTab("profile");
+    };
+
     // Get user initials for avatar
     const getUserInitials = () => {
         if (!user?.username) return "U";
         return user.username.substring(0, 2).toUpperCase();
+    };
+
+    // Check if user has avatar
+    const hasAvatar = () => {
+        return user?.avatarUrl && user.avatarUrl !== "/default-avatar.png";
     };
 
     return (
@@ -103,33 +112,45 @@ const Landing = () => {
                         </svg>
                         <span>Wallet</span>
                     </button>
-
-                    <button
-                        className={`navItem ${activeTab === "profile" ? "navItemActive" : ""}`}
-                        onClick={() => setActiveTab("profile")}
-                    >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5z" />
-                            <path d="M3 21a9 9 0 0 1 18 0" />
-                        </svg>
-                        <span>Profile</span>
-                    </button>
                 </nav>
 
-                {/* User Section at Bottom */}
-                <div className="sidebarBottom">
+                {/* User Section at Bottom - Clickable to Profile */}
+                <div className="sidebarBottom" onClick={handleProfileClick}>
                     {user && (
                         <>
                             <div className="userAvatar">
-                                {getUserInitials()}
+                                {hasAvatar() ? (
+                                    <img 
+                                        src={user.avatarUrl} 
+                                        alt="User Avatar" 
+                                        className="userAvatarImage"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            e.target.nextSibling.style.display = 'flex';
+                                        }}
+                                    />
+                                ) : null}
+                                <div 
+                                    className="userAvatarInitials" 
+                                    style={{ display: hasAvatar() ? 'none' : 'flex' }}
+                                >
+                                    {getUserInitials()}
+                                </div>
                             </div>
                             <div className="userInfo">
                                 <p className="userName">{user.username}</p>
-                                <p className="userRole">User Profile</p>
+                                <p className="userRole">View Profile</p>
                             </div>
                         </>
                     )}
-                    <button className="loginButton" onClick={handleLogout} title="Logout">
+                    <button 
+                        className="loginButton" 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleLogout();
+                        }} 
+                        title="Logout"
+                    >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                             <polyline points="16 17 21 12 16 7" />
