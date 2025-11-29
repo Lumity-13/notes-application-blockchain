@@ -1,13 +1,23 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 const FindReplaceModal = ({ onClose, onFindReplace }) => {
   const [findText, setFindText] = useState("");
   const [replaceText, setReplaceText] = useState("");
 
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState(null);
   const [dragging, setDragging] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
   const modalRef = useRef(null);
+
+  // Center the modal on mount
+  useEffect(() => {
+    if (modalRef.current && position === null) {
+      const modalRect = modalRef.current.getBoundingClientRect();
+      const centerX = (window.innerWidth - modalRect.width) / 2;
+      const centerY = (window.innerHeight - modalRect.height) / 2;
+      setPosition({ x: centerX, y: centerY });
+    }
+  }, [position]);
 
   const handleMouseDown = (e) => {
     setDragging(true);
@@ -42,26 +52,24 @@ const FindReplaceModal = ({ onClose, onFindReplace }) => {
       className="find-replace-backdrop"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      style={{
-        background: "rgba(15, 18, 32, 0.3)", // transparent backdrop
-      }}
     >
       <div
         ref={modalRef}
         className="find-replace-modal"
         style={{
           position: "absolute",
-          top: position.y,
-          left: position.x,
+          top: position?.y || "50%",
+          left: position?.x || "50%",
+          transform: position ? "none" : "translate(-50%, -50%)",
           cursor: dragging ? "grabbing" : "default",
         }}
-        onMouseDown={(e) => e.stopPropagation()} // prevent backdrop dragging
+        onMouseDown={(e) => e.stopPropagation()}
       >
         {/* Drag handle */}
         <div
           className="modal-header"
           onMouseDown={handleMouseDown}
-          style={{ cursor: "grab", fontWeight: "bold", marginBottom: "10px" }}
+          style={{ cursor: "grab", fontWeight: "bold", marginBottom: "10px", color: "#f1f5f9" }}
         >
           Find & Replace
         </div>
@@ -79,8 +87,8 @@ const FindReplaceModal = ({ onClose, onFindReplace }) => {
           onChange={(e) => setReplaceText(e.target.value)}
         />
         <div className="find-replace-buttons">
-          <button onClick={handleReplace}>Replace All</button>
           <button onClick={onClose}>Cancel</button>
+          <button onClick={handleReplace}>Replace All</button>
         </div>
       </div>
     </div>

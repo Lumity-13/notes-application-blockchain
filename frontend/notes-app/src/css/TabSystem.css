@@ -11,17 +11,18 @@
 .tab-bar {
   display: flex;
   align-items: center;
-  background: #1a1f2e;
-  border-bottom: 1px solid #2a2f55;
-  padding: 0 8px;
-  min-height: 40px;
+  background: #0f172a;
+  border-bottom: 1px solid #334155;
+  padding: 0 12px;
+  min-height: 48px;
   overflow-x: auto;
   overflow-y: hidden;
   margin: 0;
+  gap: 8px;
 }
 
 .tab-bar::-webkit-scrollbar {
-  height: 3px;
+  height: 4px;
 }
 
 .tab-bar::-webkit-scrollbar-track {
@@ -29,55 +30,63 @@
 }
 
 .tab-bar::-webkit-scrollbar-thumb {
-  background: #2a2f55;
+  background: #334155;
   border-radius: 2px;
+}
+
+.tab-bar::-webkit-scrollbar-thumb:hover {
+  background: #475569;
 }
 
 .tabs-container {
   display: flex;
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
+  gap: 4px;
 }
 
 .tab {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: #0f1220;
-  border: 1px solid #2a2f55;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #1e293b;
+  border: 1px solid #334155;
   border-bottom: none;
-  color: #9ca3af;
+  color: #64748b;
   cursor: pointer;
   user-select: none;
-  min-width: 120px;
-  max-width: 200px;
+  min-width: 140px;
+  max-width: 220px;
   position: relative;
   transition: all 0.2s ease;
-  border-radius: 6px 6px 0 0;
-  margin-right: 2px;
+  border-radius: 8px 8px 0 0;
+  font-weight: 500;
 }
 
 .tab:hover {
-  background: #1a1f2e;
-  color: #e7e9ff;
+  background: #252f3f;
+  color: #94a3b8;
+  border-color: #475569;
 }
 
 .tab.active {
-  background: #0f1220;
-  color: #e7e9ff;
-  border-color: #8b5cf6;
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #6366f1;
+  border-bottom: 2px solid #6366f1;
   z-index: 1;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3), 0 0 15px rgba(99, 102, 241, 0.2);
 }
 
 .tab.active::after {
   content: '';
   position: absolute;
-  bottom: -1px;
+  bottom: -2px;
   left: 0;
   right: 0;
-  height: 1px;
-  background: #0f1220;
+  height: 2px;
+  background: #1e293b;
 }
 
 .tab-title {
@@ -85,16 +94,17 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 14px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .unsaved-indicator {
   color: #fbbf24;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1;
+  font-weight: 700;
 }
 
 .tab-close-btn {
@@ -102,40 +112,43 @@
   border: none;
   color: inherit;
   cursor: pointer;
-  padding: 2px;
-  border-radius: 3px;
+  padding: 4px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.6;
+  opacity: 0.5;
   transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
 .tab-close-btn:hover {
   opacity: 1;
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
+  background: rgba(248, 113, 113, 0.2);
+  color: #f87171;
 }
 
 .add-tab-btn {
-  background: none;
-  border: none;
-  color: #9ca3af;
+  background: #1e293b;
+  border: 1px solid #334155;
+  color: #f9f9f9;
   cursor: pointer;
-  padding: 8px;
-  margin-left: 4px;
-  border-radius: 4px;
+  padding: 10px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
   flex-shrink: 0;
+  width: 36px;
+  height: 36px;
 }
 
 .add-tab-btn:hover {
-  background: #2a2f55;
-  color: #e7e9ff;
+  background: #334155;
+  border-color: #6366f1;
+  color: #6366f1;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
 }
 
 .add-tab-btn:active {
@@ -145,28 +158,39 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .tab {
-    min-width: 100px;
-    max-width: 150px;
-    padding: 6px 10px;
+    min-width: 110px;
+    max-width: 160px;
+    padding: 8px 12px;
   }
   
   .tab-title {
-    font-size: 12px;
+    font-size: 13px;
   }
   
   .add-tab-btn {
-    padding: 6px;
+    padding: 8px;
+  }
+  
+  .tab-bar {
+    padding: 0 8px;
+    min-height: 44px;
   }
 }
 
 @media (max-width: 480px) {
   .tab {
-    min-width: 80px;
-    max-width: 120px;
-    padding: 6px 8px;
+    min-width: 90px;
+    max-width: 130px;
+    padding: 6px 10px;
+    gap: 6px;
   }
   
   .tab-close-btn {
-    padding: 1px;
+    padding: 2px;
+  }
+  
+  .tab-bar {
+    padding: 0 6px;
+    min-height: 40px;
   }
 }
