@@ -6,7 +6,7 @@ import React, { useState, useEffect } from "react";
 import { Blockfrost, Lucid } from "lucid-cardano";
 import "../css/Wallet.css";
 
-const CARDANO_NETWORK = import.meta.env. VITE_CARDANO_NETWORK || "Preprod";
+const CARDANO_NETWORK = import.meta.env.VITE_CARDANO_NETWORK || "Preprod";
 const BLOCKFROST_PROJECT_ID = import. meta.env. VITE_BLOCKFROST_PROJECT_ID_PREPROD || "";
 
 export default function Wallet() {
@@ -45,13 +45,13 @@ export default function Wallet() {
 
       const lucidInstance = await Lucid.new(
         new Blockfrost(
-          "https://cardano-preprod.blockfrost.io/api/v0",
+          "https://cardano-preprod. blockfrost.io/api/v0",
           BLOCKFROST_PROJECT_ID
         ),
         "Preprod"
       );
 
-      const api = await window.cardano[selectedWallet]. enable();
+      const api = await window.cardano[selectedWallet].enable();
       lucidInstance.selectWallet(api);
 
       const addr = await lucidInstance.wallet.address();
@@ -91,11 +91,11 @@ export default function Wallet() {
 
       const tx = await lucid
         .newTx()
-        . payToAddress(recipient, { lovelace: BigInt(Math.floor(lovelace)) })
+        .payToAddress(recipient, { lovelace: BigInt(Math.floor(lovelace)) })
         .complete();
 
       const signedTx = await tx.sign(). complete();
-      const hash = await signedTx. submit();
+      const hash = await signedTx.submit();
 
       setTxHash(hash);
       setRecipient("");
@@ -130,7 +130,7 @@ export default function Wallet() {
           <div className="wallet-info-card-icon network">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
-              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15. 3 0 0 1 4-10z" />
             </svg>
           </div>
           <div className="wallet-info-card-content">
@@ -170,7 +170,7 @@ export default function Wallet() {
             <label>Available Wallets</label>
             <div className="wallet-select-container">
               <select value={selectedWallet} onChange={(e) => setSelectedWallet(e.target.value)}>
-                <option value="">Choose a wallet... </option>
+                <option value="">Choose a wallet...</option>
                 {wallets.map((w) => (
                   <option key={w} value={w}>
                     {w. charAt(0).toUpperCase() + w.slice(1)}
@@ -264,7 +264,7 @@ export default function Wallet() {
                     type="number"
                     placeholder="1000000"
                     value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    onChange={(e) => setAmount(e.target. value)}
                     disabled={loading}
                   />
                   <span className="wallet-amount-hint">1 ADA = 1,000,000 Lovelace</span>
@@ -311,7 +311,7 @@ export default function Wallet() {
       {txHash && (
         <div className="wallet-alert success">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M22 11. 08V12a10 10 0 1 1-5.93-9.14" />
+            <path d="M22 11. 08V12a10 10 0 1 1-5. 93-9.14" />
             <polyline points="22 4 12 14. 01 9 11.01" />
           </svg>
           <div>
@@ -334,7 +334,7 @@ export default function Wallet() {
             </a>
             
             <p className="wallet-tx-reminder">
-              🕒 Please wait 3–5 minutes for Cardanoscan to display the transaction.
+              🕒 Please wait 3–5 minutes for Cardanoscan to display the transaction. 
             </p>
           </div>
         </div>

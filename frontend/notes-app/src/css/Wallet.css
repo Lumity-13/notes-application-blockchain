@@ -507,15 +507,15 @@
   .wallet-wrapper {
     padding: 20px;
   }
-  
+
   .wallet-info-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .wallet-connect-section {
     padding: 24px;
   }
-  
+
   .wallet-amount-hint {
     display: none;
   }
