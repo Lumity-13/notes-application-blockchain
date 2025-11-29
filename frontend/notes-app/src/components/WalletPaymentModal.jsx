@@ -268,16 +268,17 @@ const WalletPaymentModal = ({ isOpen, onClose, onPaymentSuccess, wallet }) => {
           )}
         </div>
 
-        {/* Footer */}
-        <div className="wallet-modal-footer">
-          <button 
-            className="wallet-modal-btn secondary"
-            onClick={onClose}
-            disabled={isProcessingPayment}
-          >
-            Cancel
-          </button>
-        </div>
+        {/* Footer - Hide cancel button on success and processing */}
+        {step !== 'success' && step !== 'processing' && (
+          <div className="wallet-modal-footer">
+            <button 
+              className="wallet-modal-btn secondary"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
