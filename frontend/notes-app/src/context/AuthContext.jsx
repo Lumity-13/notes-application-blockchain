@@ -25,6 +25,18 @@ export function AuthProvider({ children }) {
     localStorage.setItem("user", JSON.stringify(mapped));
   };
 
+  useEffect(() => {
+  const stored = localStorage.getItem("user");
+  if (stored) {
+    const parsed = JSON.parse(stored);
+
+    parsed.avatarUrl = parsed.avatarUrl || parsed.avatar_url || null;
+    parsed.avatar_url = parsed.avatarUrl;
+
+    setUser(parsed);
+  }
+}, []);
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
