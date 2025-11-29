@@ -49,13 +49,14 @@ public class NoteService {
     }
 
     /**
-     * Create a new note for a user
+     * Create a new note for a user (with txHash from Cardano payment)
      */
     public Optional<Note> createNote(Long userId, Note note) {
         return userRepository.findById(userId).map(user -> {
             note.setUser(user);
             note.setCreatedAt(LocalDateTime.now());
             note.setUpdatedAt(LocalDateTime.now());
+            // txHash is already set from the controller
             
             Note savedNote = noteRepository.save(note);
             createBlockchainBlock(savedNote);
@@ -65,7 +66,7 @@ public class NoteService {
     }
 
     /**
-     * Update an existing note
+     * Update an existing note (no payment required)
      */
     public Optional<Note> updateNote(Long noteId, Note updatedNote) {
         return noteRepository.findById(noteId).map(existingNote -> {
@@ -109,6 +110,7 @@ public class NoteService {
                 + note.getContent() 
                 + note.getUser().getUserId() 
                 + note.getUpdatedAt()
+                + (note.getTxHash() != null ? note.getTxHash() : "")
                 + previousHash;
         
         String newHash = HashUtil.sha256(dataToHash);

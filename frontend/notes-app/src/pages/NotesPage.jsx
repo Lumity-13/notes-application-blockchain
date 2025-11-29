@@ -2,9 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 import { getNotesByUser, createNote, updateNote, deleteNote } from '../api/notes';
+import useWallet from '../hooks/useWallet';
 import Header from '../components/Header';
 import TabSystem from '../components/TabSystem';
 import FindReplaceModal from '../components/FindReplaceModal';
+import WalletPaymentModal from '../components/WalletPaymentModal';
 import '../css/NotesPage.css';
 
 const NotesPage = () => {
@@ -15,6 +17,13 @@ const NotesPage = () => {
   const [nextTabId, setNextTabId] = useState(1);
   const [isFindReplaceOpen, setIsFindReplaceOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Wallet payment modal state
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [pendingSaveTab, setPendingSaveTab] = useState(null);
+
+  // Wallet hook
+  const wallet = useWallet();
 
   const editorRef = useRef(null);
   const titleRef = useRef(null);
@@ -37,6 +46,7 @@ const NotesPage = () => {
           id: note.id,
           title: note.title || 'Untitled',
           content: note.content || '',
+          txHash: note.txHash || null,
           hasUnsavedChanges: false,
           isSaved: true
         }));
@@ -50,6 +60,7 @@ const NotesPage = () => {
             id: `temp-${maxId + 1}`,
             title: `Untitled-${notes.length + 1}`,
             content: '',
+            txHash: null,
             hasUnsavedChanges: false,
             isSaved: false
           };
@@ -84,20 +95,25 @@ const NotesPage = () => {
   // Helpers
   const getActiveTab = () => tabs.find(tab => tab.id === activeTabId);
 
-  // Save note to backend
-  const saveNote = async (tab) => {
+  // Save note to backend (called after payment for new notes)
+  const saveNote = async (tab, txHash = null) => {
     try {
       const noteData = {
         title: tab.title,
         content: tab.content
       };
 
+      // Add txHash for new notes
+      if (txHash) {
+        noteData.txHash = txHash;
+      }
+
       console.log('Saving note:', { id: tab.id, isSaved: tab.isSaved, noteData });
 
       let savedId = tab.id;
 
       if (tab.isSaved && !String(tab.id).startsWith('temp-')) {
-        // Update existing note
+        // Update existing note (no payment required)
         console.log('Updating existing note with ID:', tab.id);
         await updateNote(tab.id, noteData);
 
@@ -110,7 +126,7 @@ const NotesPage = () => {
           )
         );
       } else {
-        // Create new note
+        // Create new note (payment already completed)
         console.log('Creating new note for user:', user.id);
         const response = await createNote(user.id, noteData);
         console.log('Create response:', response.data);
@@ -118,14 +134,14 @@ const NotesPage = () => {
 
         const oldTabId = tab.id;
 
-        // Update tab with real ID from backend and remove old temp tab
+        // Update tab with real ID from backend
         setTabs(prevTabs => {
-          // Replace the temp tab with the saved tab
           return prevTabs.map(t =>
             t.id === oldTabId
               ? {
                 ...t,
                 id: savedId,
+                txHash: txHash,
                 isSaved: true,
                 hasUnsavedChanges: false
               }
@@ -175,13 +191,49 @@ const NotesPage = () => {
       return;
     }
 
-    try {
-      await saveNote(activeTab);
-      alert('Note saved successfully!');
-    } catch (error) {
-      console.error('Save failed:', error);
-      alert('Failed to save note. Please try again.');
+    // Check if this is a new note (requires payment)
+    const isNewNote = !activeTab.isSaved || String(activeTab.id).startsWith('temp-');
+
+    if (isNewNote) {
+      // Open payment modal for new notes
+      setPendingSaveTab(activeTab);
+      setIsPaymentModalOpen(true);
+    } else {
+      // Update existing note (no payment required)
+      try {
+        await saveNote(activeTab);
+        alert('Note saved successfully!');
+      } catch (error) {
+        console.error('Save failed:', error);
+        alert('Failed to save note. Please try again.');
+      }
     }
+  };
+
+  // Handle successful payment
+  const handlePaymentSuccess = async (txHash) => {
+    setIsPaymentModalOpen(false);
+    
+    if (!pendingSaveTab) {
+      alert('Error: No pending note to save.');
+      return;
+    }
+
+    try {
+      await saveNote(pendingSaveTab, txHash);
+      alert(`Note saved successfully!\n\nTransaction: ${txHash.slice(0, 20)}...`);
+    } catch (error) {
+      console.error('Save failed after payment:', error);
+      alert(`Payment was successful (tx: ${txHash.slice(0, 20)}...) but note save failed. Please contact support.`);
+    } finally {
+      setPendingSaveTab(null);
+    }
+  };
+
+  // Handle payment modal close
+  const handlePaymentModalClose = () => {
+    setIsPaymentModalOpen(false);
+    setPendingSaveTab(null);
   };
 
   // Tab actions
@@ -234,13 +286,15 @@ const NotesPage = () => {
 
     setTabs(newTabs);
   };
+
   const handleAddTab = async () => {
     const newTab = {
-      id: `temp-${nextTabId}`, // Use temporary ID with prefix
+      id: `temp-${nextTabId}`,
       title: `Untitled-${nextTabId}`,
       content: '',
+      txHash: null,
       hasUnsavedChanges: false,
-      isSaved: false // Mark as not saved yet
+      isSaved: false
     };
     setTabs(prev => [...prev, newTab]);
     setActiveTabId(newTab.id);
@@ -339,10 +393,21 @@ const NotesPage = () => {
         </section>
       </main>
 
+      {/* Find/Replace Modal */}
       {isFindReplaceOpen && (
         <FindReplaceModal
           onClose={() => setIsFindReplaceOpen(false)}
           onFindReplace={handleFindReplace}
+        />
+      )}
+
+      {/* Wallet Payment Modal */}
+      {isPaymentModalOpen && (
+        <WalletPaymentModal
+          isOpen={isPaymentModalOpen}
+          onClose={handlePaymentModalClose}
+          onPaymentSuccess={handlePaymentSuccess}
+          wallet={wallet}
         />
       )}
     </div>

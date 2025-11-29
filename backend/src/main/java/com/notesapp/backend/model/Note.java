@@ -2,7 +2,7 @@ package com.notesapp.backend.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import com.fasterxml. jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "notes")
@@ -20,6 +20,10 @@ public class Note {
 
     private String title;
     private String content;
+
+    @Column(name = "tx_hash")
+    @JsonProperty("txHash")
+    private String txHash;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -60,6 +64,14 @@ public class Note {
         this.content = content;
     }
 
+    public String getTxHash() {
+        return txHash;
+    }
+
+    public void setTxHash(String txHash) {
+        this.txHash = txHash;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -71,6 +83,7 @@ public class Note {
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
