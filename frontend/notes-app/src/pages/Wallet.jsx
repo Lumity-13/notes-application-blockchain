@@ -45,7 +45,7 @@ export default function Wallet() {
 
       const lucidInstance = await Lucid.new(
         new Blockfrost(
-          "https://cardano-preprod. blockfrost.io/api/v0",
+          "https://cardano-preprod.blockfrost.io/api/v0",
           BLOCKFROST_PROJECT_ID
         ),
         "Preprod"
