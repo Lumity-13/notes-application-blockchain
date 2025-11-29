@@ -2,6 +2,7 @@ package com.notesapp.backend.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import com.fasterxml. jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "notes")
@@ -10,6 +11,7 @@ public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "note_id")
+    @JsonProperty("id")
     private Long noteId;
 
     @ManyToOne
