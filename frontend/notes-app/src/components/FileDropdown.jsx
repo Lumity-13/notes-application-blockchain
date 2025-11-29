@@ -1,8 +1,9 @@
 import React from 'react';
 
-const FileDropdown = ({ isOpen, onClose, onNewFile }) => {
+const FileDropdown = ({ isOpen, onClose, onNewFile, onSave }) => {
   const fileOptions = [
     'New File',
+    'Save',
     '--- More options coming soon ---'
   ];
 
@@ -13,6 +14,8 @@ const FileDropdown = ({ isOpen, onClose, onNewFile }) => {
       // Handle specific file options
       if (option === 'New File' && onNewFile) {
         onNewFile();
+      } else if (option === 'Save' && onSave) {
+        onSave();
       }
       
       onClose();

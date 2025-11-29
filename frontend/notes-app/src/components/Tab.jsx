@@ -21,7 +21,7 @@ const Tab = ({
     >
       <span className="tab-title">
         {title}
-        {hasUnsavedChanges && <span className="unsaved-indicator">●</span>}
+        {hasUnsavedChanges && <span className="unsaved-indicator" title="Unsaved changes">●</span>}
       </span>
       <button 
         className="tab-close-btn" 
