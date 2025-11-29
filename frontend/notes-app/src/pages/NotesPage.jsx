@@ -214,20 +214,13 @@ const NotesPage = () => {
 
     const tabToClose = tabs.find(tab => tab.id === tabId);
 
-    if (tabToClose?.isSaved && !String(tabToClose.id).startsWith('temp-')) {
-      if (tabToClose.hasUnsavedChanges) {
-        const confirmClose = window.confirm('You have unsaved changes. Close without saving?');
-        if (!confirmClose) return;
-      }
-
-      try {
-        await deleteNote(tabId);
-      } catch (error) {
-        console.error('Error deleting note:', error);
-      }
+    // Only ask for confirmation if there are unsaved changes
+    if (tabToClose?.hasUnsavedChanges) {
+      const confirmClose = window.confirm('You have unsaved changes. Close without saving?');
+      if (!confirmClose) return;
     }
 
-    // Calculate new tabs and new active tab BEFORE setting state
+    // Just remove from tabs - DO NOT delete from database
     const newTabs = tabs.filter(tab => tab.id !== tabId);
 
     // Update active tab if we're closing the current active tab
