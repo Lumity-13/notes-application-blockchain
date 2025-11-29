@@ -8,7 +8,7 @@ import RegisterPopup from "./RegisterPopup";
 import { useAuth } from "../context/AuthContext";
 import '../css/Header.css';
 
-const Header = ({ onBackToHome, onNewFile, onFindReplaceClick, editorRef }) => {
+const Header = ({ onBackToHome, onNewFile, onFindReplaceClick, onSave, editorRef }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [showRegisterPopup, setShowRegisterPopup] = useState(false);
@@ -67,7 +67,12 @@ const Header = ({ onBackToHome, onNewFile, onFindReplaceClick, editorRef }) => {
               onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleDropdownToggle("file"); }}>
               File
             </button>
-            <FileDropdown isOpen={openDropdown === "file"} onClose={closeDropdowns} onNewFile={onNewFile} />
+            <FileDropdown 
+              isOpen={openDropdown === "file"} 
+              onClose={closeDropdowns} 
+              onNewFile={onNewFile}
+              onSave={onSave}
+            />
           </div>
 
           <div className="menu-item">
