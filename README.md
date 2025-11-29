@@ -9,10 +9,11 @@
 This project implements a **decentralized notes application** that integrates fundamental blockchain principles. Each note is cryptographically linked to a blockchain block, creating an immutable ledger that ensures data integrity and demonstrates distributed ledger technology. It showcases how blockchain can be applied beyond cryptocurrencies by providing a secure and transparent way to store and manage personal notes. Users can create, view, and manage notes while experiencing how each entry becomes part of an immutable blockchain ledger, ensuring permanent and verifiable recordkeeping.
 
 ### Key Features
-- Cryptographic hash linking between blocks
-- User-based note management system  
-- Blockchain validation and integrity checks
-- Data tamper detection through hash verification
+- **Cardano Wallet Integration** - Pay 2 ADA (Preprod) to create notes via Lace wallet
+- **Cryptographic Hash Linking** - Each note is linked to a blockchain block
+- **Transaction Verification** - Note creation tied to on-chain Cardano transactions
+- **User-based Note Management** - Secure authentication with BCrypt password hashing
+- **Blockchain Validation** - Integrity checks and tamper detection through hash verification
 
 ---
 
@@ -20,9 +21,11 @@ This project implements a **decentralized notes application** that integrates fu
 
 | Component | Technology |
 |-----------|------------|
-| **Frontend** | React.js + Vite|
+| **Frontend** | React.js + Vite |
 | **Backend** | Spring Boot (Java 21, Maven) |
 | **Database** | PostgreSQL 17.6 |
+| **Blockchain** | Cardano (Preprod Testnet) |
+| **Wallet** | Lace (via lucid-cardano) |
 | **Version Control** | GitHub |
 
 ---
@@ -31,10 +34,23 @@ This project implements a **decentralized notes application** that integrates fu
 
 ```
 notes-application-blockchain/
-├── backend/          # Spring Boot API server
-├── frontend/         # React.js client application  
-├── database/         # PostgreSQL schema & scripts
-└── README.md         # Project documentation
+├── backend/                    # Spring Boot API server
+│   └── src/main/java/com/notesapp/backend/
+│       ├── controller/         # REST endpoints
+│       ├── model/              # Entity classes
+│       ├── dto/                # Data transfer objects
+│       ├── service/            # Business logic
+│       ├── repository/         # Database access
+│       └── security/           # Auth & config
+├── frontend/notes-app/         # React.js client application
+│   └── src/
+│       ├── api/                # API client
+│       ├── components/         # Reusable components
+│       ├── context/            # Auth context
+│       ├── hooks/              # Custom hooks (useWallet)
+│       ├── pages/              # Page components
+│       └── css/                # Stylesheets
+└── README.md                   # Project documentation
 ```
 
 ---
@@ -43,12 +59,10 @@ notes-application-blockchain/
 
 *2AM DISCORD DECISIONS*
 
-
 - **Cantiller, Christian Jayson J.** *(Frontend Dev)*
 - **Diva, Justin Andry N.** *(Frontend Dev)*
 - **Lada, Nathan Xander** *(Backend Dev)*
 - **Go, Felix Christian T.** *(Frontend Dev)*
-
 
 ---
 
@@ -59,6 +73,8 @@ notes-application-blockchain/
 - Node.js 16+ installed
 - PostgreSQL 17.6 installed
 - Git installed
+- [Lace Wallet](https://www.lace.io/) browser extension installed
+- Blockfrost API key (get free at [blockfrost.io](https://blockfrost.io/))
 
 ### 1. Clone Repository
 ```bash
@@ -88,14 +104,19 @@ CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     username VARCHAR(100) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
-    password VARCHAR(200) NOT NULL
+    password VARCHAR(200) NOT NULL,
+    avatar_url TEXT,
+    token VARCHAR(255)
 );
 
 CREATE TABLE notes (
     note_id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    title VARCHAR(255),
     content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    tx_hash VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE blockchain_ledger (
@@ -114,25 +135,76 @@ SELECT * FROM users;
 SELECT * FROM notes;
 SELECT * FROM blockchain_ledger;
 ```
-`Note: When you run multiple SELECTs, pgAdmin usually shows results of the last query only (blockchain_ledger).
-That’s why you’re only seeing that table in the Data Output.`
 
-### 3. Launch Backend
+### 3. Environment Setup
+
+#### Frontend (.env)
+Create `frontend/notes-app/.env`:
+```env
+VITE_API_URL=http://localhost:8080
+VITE_CARDANO_NETWORK=Preprod
+VITE_BLOCKFROST_PROJECT_ID_PREPROD=your_blockfrost_project_id_here
+```
+
+### 4. Launch Application
+
+#### Option A: Run both together (requires concurrently)
 ```bash
-cd backend/
-./mvnw spring-boot:run
+npm run dev
+```
+
+#### Option B: Run separately
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
+mvn spring-boot:run
 ```
 *Server runs on: http://localhost:8080*
 
-### WARNING: PLACEHOLDER
-### 4. Launch Frontend 
+**Terminal 2 - Frontend:**
 ```bash
-cd frontend/
+cd frontend/notes-app
 npm install
 npm run dev
 ```
-*Client runs on: http://localhost:3000*
-### WARNING: PLACEHOLDER
+*Client runs on: http://localhost:5173*
+
+---
+
+## Wallet Setup (Preprod Testnet)
+
+1. **Install Lace Wallet** - Download from [lace.io](https://www.lace.io/)
+2. **Create/Import Wallet** - Set up a new wallet or import existing
+3. **Switch to Preprod Network** - In Lace settings, change network to "Preprod"
+4. **Get Test ADA** - Use the [Cardano Testnet Faucet](https://docs.cardano.org/cardano-testnets/tools/faucet/)
+
+---
+
+## How It Works
+
+### Note Creation Flow
+```
+1. User writes note (title + content)
+2. User clicks "Save"
+3. Payment modal opens
+4. User connects Lace wallet
+5. User pays 2 ADA (Preprod)
+6. Transaction submitted to Cardano blockchain
+7. Note saved with transaction hash (txHash)
+8. Internal blockchain block created with SHA-256 hash
+```
+
+### Payment Configuration
+| Setting | Value |
+|---------|-------|
+| Amount | 2 ADA (2,000,000 Lovelace) |
+| Network | Preprod Testnet |
+| Recipient | `addr_test1qqt6gp96cldazkxg79ugk8k7qpgeyu8qnuxktg0q2f00ev5jv3g8druqq7ep8eyy6mj66hcle5vdp3rt5k9jrspteywqpy9mra` |
+
+### Blockchain Integration
+- **Cardano (External)**: Each note creation requires an on-chain ADA payment
+- **Internal Ledger**: Notes are also linked in an internal SHA-256 blockchain for integrity verification
 
 ---
 
@@ -140,9 +212,9 @@ npm run dev
 
 ### Core Endpoints
 
-#### 1. Create User
+#### 1. Register User
 ```http
-POST http://localhost:8080/users
+POST http://localhost:8080/users/register
 Content-Type: application/json
 
 {
@@ -152,22 +224,46 @@ Content-Type: application/json
 }
 ```
 
-#### 2. Add Note (Creates Blockchain Block)
+#### 2. Login
+```http
+POST http://localhost:8080/users/login
+Content-Type: application/json
+
+{
+  "email": "nathan@example.com", 
+  "password": "12345"
+}
+```
+
+#### 3. Add Note (Requires txHash)
 ```http
 POST http://localhost:8080/notes/user/1
 Content-Type: application/json
 
 {
-  "content": "First blockchain note"
+  "title": "My First Note",
+  "content": "First blockchain note",
+  "txHash": "abc123..."
 }
 ```
 
-#### 3. View Blockchain
+#### 4. Update Note (No payment required)
+```http
+PUT http://localhost:8080/notes/1
+Content-Type: application/json
+
+{
+  "title": "Updated Title",
+  "content": "Updated content"
+}
+```
+
+#### 5. View Blockchain
 ```http
 GET http://localhost:8080/blocks
 ```
 
-#### 4. Validate Chain Integrity
+#### 6. Validate Chain Integrity
 ```http
 GET http://localhost:8080/blocks/validate
 ```
@@ -176,16 +272,14 @@ GET http://localhost:8080/blocks/validate
 
 ## Development Utilities
 
-## Database rows check
+### Database Queries
 ```sql
 -- Users Table
 SELECT * FROM users;
-```
-```sql
--- Notes Table
+
+-- Notes Table (includes tx_hash)
 SELECT * FROM notes;
-```
-```sql
+
 -- Blockchain Ledger Table
 SELECT * FROM blockchain_ledger;
 ```
@@ -200,10 +294,9 @@ TRUNCATE TABLE users RESTART IDENTITY CASCADE;
 
 ---
 
-## How It Works
+## Security Features
 
-1. **User Registration**: Users create accounts to manage their notes
-2. **Note Creation**: Each new note automatically generates a blockchain block
-3. **Hash Linking**: Blocks are cryptographically linked using SHA-256 hashes
-4. **Chain Validation**: The system can verify the entire blockchain's integrity
-5. **Tamper Detection**: Any modification to historical data breaks the chain
+- **BCrypt Password Hashing** - Passwords are securely hashed before storage
+- **Wallet-based Payments** - Note creation requires verified Cardano transaction
+- **Transaction Verification** - Each note stores its associated txHash
+- **Chain Validation** - Built-in endpoint to verify blockchain integrity
