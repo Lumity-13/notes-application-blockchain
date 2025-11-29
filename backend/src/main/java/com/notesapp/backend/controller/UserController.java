@@ -9,6 +9,7 @@ import com.notesapp.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // =====================================
     // Helper: generate simple token (demo)
@@ -75,7 +79,7 @@ public class UserController {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         // (for demo) store raw password
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setAvatarUrl(null);  // uploaded later from profile
         user.setToken(null);
 
@@ -98,7 +102,7 @@ public class UserController {
         User user = optionalUser.get();
 
         // Compare passwords (raw for demo)
-        if (!user.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Invalid email or password.");
         }
@@ -139,7 +143,7 @@ public class UserController {
                     }
 
                     if (request.getPassword() != null) {
-                        user.setPassword(request.getPassword());
+                        user.setPassword(passwordEncoder.encode(request.getPassword()));
                     }
 
                     // Cloudinary / Supabase URL

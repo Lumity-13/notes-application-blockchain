@@ -7,7 +7,7 @@ import { Blockfrost, Lucid } from "lucid-cardano";
 import "../css/Wallet.css";
 
 const CARDANO_NETWORK = import.meta.env.VITE_CARDANO_NETWORK || "Preprod";
-const BLOCKFROST_PROJECT_ID = import. meta.env. VITE_BLOCKFROST_PROJECT_ID_PREPROD || "";
+const BLOCKFROST_PROJECT_ID = import.meta.env.VITE_BLOCKFROST_PROJECT_ID_PREPROD || "";
 
 export default function Wallet() {
   const [lucid, setLucid] = useState(null);
