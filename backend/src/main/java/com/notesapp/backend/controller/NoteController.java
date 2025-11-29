@@ -1,5 +1,6 @@
 package com.notesapp.backend.controller;
 
+import com.notesapp.backend.dto.CreateNoteRequest;
 import com.notesapp.backend.model.Note;
 import com.notesapp.backend.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,19 +49,30 @@ public class NoteController {
     }
 
     /**
-     * Create a new note for a user
+     * Create a new note for a user (requires txHash for payment verification)
      * POST /notes/user/{userId}
-     * Body: { "title": "...", "content": "..." }
+     * Body: { "title": "...", "content": "...", "txHash": "..." }
      */
     @PostMapping("/user/{userId}")
-    public ResponseEntity<Note> createNote(@PathVariable Long userId, @RequestBody Note note) {
+    public ResponseEntity<?> createNote(@PathVariable Long userId, @RequestBody CreateNoteRequest request) {
+        // Validate txHash is provided
+        if (request.getTxHash() == null || request.getTxHash().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Transaction hash (txHash) is required. Please complete payment first.");
+        }
+
+        // Create note entity from request
+        Note note = new Note();
+        note.setTitle(request.getTitle());
+        note.setContent(request.getContent());
+        note.setTxHash(request.getTxHash());
+
         return noteService.createNote(userId, note)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     /**
-     * Update an existing note
+     * Update an existing note (no payment required for updates)
      * PUT /notes/{id}
      * Body: { "title": "...", "content": "..." }
      */
