@@ -61,7 +61,7 @@ const Landing = () => {
     };
 
     const handleNewNote = () => {
-        navigate("/notes");
+        navigate("/notes", { state: { createNew: true } });
     };
 
     const handleOpenNote = (noteId) => {

@@ -31,7 +31,7 @@ const NotesPage = () => {
       setIsLoading(true);
       const response = await getNotesByUser(user.id);
       const notes = response.data;
-      
+
       if (notes.length > 0) {
         const formattedTabs = notes.map(note => ({
           id: note.id,
@@ -40,26 +40,41 @@ const NotesPage = () => {
           hasUnsavedChanges: false,
           isSaved: true
         }));
-        setTabs(formattedTabs);
-        
-        // Check if a specific note was requested from Landing page
-        const requestedNoteId = location.state?.noteId;
-        if (requestedNoteId) {
-          setActiveTabId(requestedNoteId);
-        } else {
-          setActiveTabId(formattedTabs[0].id);
-        }
-        
-        // Set next temp ID to avoid conflicts
+
         const maxId = Math.max(...notes.map(n => n.id));
-        setNextTabId(maxId + 1);
+
+        // Check if user wants to create a new note from Landing page
+        const createNew = location.state?.createNew;
+        if (createNew) {
+          const newTab = {
+            id: `temp-${maxId + 1}`,
+            title: `Untitled-${notes.length + 1}`,
+            content: '',
+            hasUnsavedChanges: false,
+            isSaved: false
+          };
+          setTabs([...formattedTabs, newTab]);
+          setActiveTabId(newTab.id);
+          setNextTabId(maxId + 2);
+        } else {
+          setTabs(formattedTabs);
+
+          // Check if a specific note was requested from Landing page
+          const requestedNoteId = location.state?.noteId;
+          if (requestedNoteId) {
+            setActiveTabId(requestedNoteId);
+          } else {
+            setActiveTabId(formattedTabs[0].id);
+          }
+
+          setNextTabId(maxId + 1);
+        }
       } else {
         // Create first note if none exist
         await handleAddTab();
       }
     } catch (error) {
       console.error('Error loading notes:', error);
-      // Create first note on error
       await handleAddTab();
     } finally {
       setIsLoading(false);
@@ -85,7 +100,7 @@ const NotesPage = () => {
         // Update existing note
         console.log('Updating existing note with ID:', tab.id);
         await updateNote(tab.id, noteData);
-        
+
         // Mark as saved
         setTabs(prevTabs =>
           prevTabs.map(t =>
@@ -100,32 +115,32 @@ const NotesPage = () => {
         const response = await createNote(user.id, noteData);
         console.log('Create response:', response.data);
         savedId = response.data.id;
-        
+
         const oldTabId = tab.id;
-        
+
         // Update tab with real ID from backend and remove old temp tab
         setTabs(prevTabs => {
           // Replace the temp tab with the saved tab
           return prevTabs.map(t =>
             t.id === oldTabId
-              ? { 
-                  ...t, 
-                  id: savedId, 
-                  isSaved: true, 
-                  hasUnsavedChanges: false 
-                }
+              ? {
+                ...t,
+                id: savedId,
+                isSaved: true,
+                hasUnsavedChanges: false
+              }
               : t
           );
         });
-        
+
         // Update active tab ID if this was the active tab
         if (activeTabId === oldTabId) {
           setActiveTabId(savedId);
         }
-        
+
         return savedId;
       }
-      
+
       return savedId;
     } catch (error) {
       console.error('Error saving note:', error);
@@ -146,7 +161,7 @@ const NotesPage = () => {
     // Validate title and content
     const trimmedTitle = activeTab.title?.trim() || '';
     const trimmedContent = activeTab.content?.trim() || '';
-    
+
     // Check if title starts with "Untitled" or is empty
     if (!trimmedTitle || trimmedTitle.startsWith('Untitled')) {
       alert('Please enter a proper title before saving (not "Untitled").');
@@ -195,44 +210,42 @@ const NotesPage = () => {
   const handleTabSelect = (tabId) => setActiveTabId(tabId);
 
   const handleTabClose = async (tabId) => {
-  if (tabs.length === 1) return;
-  
-  const tabToClose = tabs.find(tab => tab. id === tabId);
-  
-  if (tabToClose?. isSaved && ! String(tabToClose.id). startsWith('temp-')) {
-    if (tabToClose.hasUnsavedChanges) {
-      const confirmClose = window.confirm('You have unsaved changes. Close without saving?');
-      if (!confirmClose) return;
+    if (tabs.length === 1) return;
+
+    const tabToClose = tabs.find(tab => tab.id === tabId);
+
+    if (tabToClose?.isSaved && !String(tabToClose.id).startsWith('temp-')) {
+      if (tabToClose.hasUnsavedChanges) {
+        const confirmClose = window.confirm('You have unsaved changes. Close without saving?');
+        if (!confirmClose) return;
+      }
+
+      try {
+        await deleteNote(tabId);
+      } catch (error) {
+        console.error('Error deleting note:', error);
+      }
     }
-    
-    try {
-      await deleteNote(tabId);
-    } catch (error) {
-      console. error('Error deleting note:', error);
-    }
-  }
-  
-  setTabs(prevTabs => {
-    const newTabs = prevTabs. filter(tab => tab.id !== tabId);
-    
-    // Fix: Only update activeTabId if we're closing the active tab
+
+    // Calculate new tabs and new active tab BEFORE setting state
+    const newTabs = tabs.filter(tab => tab.id !== tabId);
+
+    // Update active tab if we're closing the current active tab
     if (tabId === activeTabId && newTabs.length > 0) {
-      const tabIndex = prevTabs. findIndex(tab => tab.id === tabId);
-      const newActiveTab = newTabs[Math. min(tabIndex, newTabs.length - 1)] || newTabs[0];
+      const tabIndex = tabs.findIndex(tab => tab.id === tabId);
+      const newActiveTab = newTabs[Math.min(tabIndex, newTabs.length - 1)] || newTabs[0];
       if (newActiveTab) {
         setActiveTabId(newActiveTab.id);
       }
     }
-    
-    return newTabs;
-  });
-};
 
+    setTabs(newTabs);
+  };
   const handleAddTab = async () => {
-    const newTab = { 
+    const newTab = {
       id: `temp-${nextTabId}`, // Use temporary ID with prefix
-      title: `Untitled-${nextTabId}`, 
-      content: '', 
+      title: `Untitled-${nextTabId}`,
+      content: '',
       hasUnsavedChanges: false,
       isSaved: false // Mark as not saved yet
     };
@@ -246,11 +259,11 @@ const NotesPage = () => {
     setTabs(prevTabs =>
       prevTabs.map(tab =>
         tab.id === activeTabId
-          ? { 
-              ...tab, 
-              content: tab.content.replace(new RegExp(findText, 'g'), replaceText),
-              hasUnsavedChanges: true 
-            }
+          ? {
+            ...tab,
+            content: tab.content.replace(new RegExp(findText, 'g'), replaceText),
+            hasUnsavedChanges: true
+          }
           : tab
       )
     );
@@ -270,12 +283,12 @@ const NotesPage = () => {
           onFindReplaceClick={() => setIsFindReplaceOpen(true)}
           editorRef={editorRef}
         />
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
           height: '100vh',
-          color: '#9ca3af' 
+          color: '#9ca3af'
         }}>
           Loading notes...
         </div>
@@ -317,7 +330,7 @@ const NotesPage = () => {
                   placeholder="Note title..."
                   spellCheck="false"
                 />
-                
+
                 {/* Content Textarea */}
                 <textarea
                   ref={editorRef}
