@@ -75,17 +75,22 @@ export default function Profile() {
       const res = await api.put(`/users/${user.id}`, body);
 
       const updatedUser = {
-        ...user,
+        id: user.id,
         username: res.data.username,
         email: res.data.email,
-        avatarUrl: res.data.avatarUrl,
+
+        // FIX: Normalize all cases
+        avatarUrl: res.data.avatarUrl || res.data.avatar_url || null,
+        avatar_url: res.data.avatarUrl || res.data.avatar_url || null,
+
+        token: user.token,
       };
 
-      // Update global user state
+      // update global user
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
-      alert("Profile updated successfully!");
+      alert("Profile updated!");
       setPassword(""); // Clear password field after save
       setAvatarFile(null); // Clear file selection
     } catch (err) {
