@@ -1,3 +1,4 @@
+// Polyfill for Buffer (needed by Lucid in browser)
 import { Buffer as BufferPolyfill } from "buffer/";
 window.Buffer = BufferPolyfill;
 
@@ -19,28 +20,42 @@ export default function Wallet() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Load available wallets (Nami, Eternl, Lace, Typhon)
   useEffect(() => {
     const loadWallets = () => {
-      if (window.cardano) setWallets(Object.keys(window.cardano));
+      if (window.cardano) {
+        const keys = Object.keys(window.cardano).filter(
+          (w) => typeof window.cardano[w] === "object"
+        );
+        setWallets(keys);
+      }
     };
     loadWallets();
-    const interval = setInterval(loadWallets, 1000);
+    const interval = setInterval(loadWallets, 800);
     return () => clearInterval(interval);
   }, []);
 
+  // Connect wallet
   const handleConnect = async () => {
     setError("");
     if (!selectedWallet) return setError("Select a wallet first");
-    
+
     try {
       setLoading(true);
+
       const lucidInstance = await Lucid.new(
-        new Blockfrost("https://cardano-preprod.blockfrost.io/api/v0", BLOCKFROST_PROJECT_ID),
+        new Blockfrost(
+          "https://cardano-preprod.blockfrost.io/api/v0",
+          BLOCKFROST_PROJECT_ID
+        ),
         "Preprod"
       );
+
       const api = await window.cardano[selectedWallet].enable();
       lucidInstance.selectWallet(api);
+
       const addr = await lucidInstance.wallet.address();
+
       setAddress(addr);
       setLucid(lucidInstance);
     } catch (err) {
@@ -50,6 +65,7 @@ export default function Wallet() {
     }
   };
 
+  // Disconnect wallet
   const handleDisconnect = () => {
     setLucid(null);
     setAddress("");
@@ -58,20 +74,29 @@ export default function Wallet() {
     setError("");
   };
 
+  // Send ADA
   const handleSend = async () => {
     setError("");
     setTxHash("");
+
     if (!lucid) return setError("Connect your wallet first");
     if (!recipient) return setError("Enter recipient address");
-    
-    const lovelace = parseFloat(amount);
-    if (isNaN(lovelace) || lovelace <= 0) return setError("Enter valid amount in Lovelace");
+
+    const lovelace = Number(amount);
+    if (isNaN(lovelace) || lovelace <= 0)
+      return setError("Enter valid amount in Lovelace");
 
     try {
       setLoading(true);
-      const tx = await lucid.newTx().payToAddress(recipient, { lovelace: BigInt(Math.floor(lovelace)) }).complete();
+
+      const tx = await lucid
+        .newTx()
+        .payToAddress(recipient, { lovelace: BigInt(Math.floor(lovelace)) })
+        .complete();
+
       const signedTx = await tx.sign().complete();
       const hash = await signedTx.submit();
+
       setTxHash(hash);
       setRecipient("");
       setAmount("");
@@ -88,16 +113,29 @@ export default function Wallet() {
 
       <div className="wallet-info-box">
         <strong>Network:</strong> {CARDANO_NETWORK}
-        <strong>Blockfrost ID:</strong> {BLOCKFROST_PROJECT_ID ? BLOCKFROST_PROJECT_ID.slice(0, 8) + "..." : "(not set)"}
+        <br />
+        <strong>Blockfrost ID:</strong>{" "}
+        {BLOCKFROST_PROJECT_ID
+          ? BLOCKFROST_PROJECT_ID.slice(0, 8) + "..."
+          : "(not set)"}
       </div>
 
+      {/* Wallet Selection */}
       {!lucid ? (
         <div className="wallet-section">
           <label>Select Wallet:</label>
-          <select value={selectedWallet} onChange={(e) => setSelectedWallet(e.target.value)}>
+          <select
+            value={selectedWallet}
+            onChange={(e) => setSelectedWallet(e.target.value)}
+          >
             <option value="">-- Select --</option>
-            {wallets.map(w => <option key={w} value={w}>{w}</option>)}
+            {wallets.map((w) => (
+              <option key={w} value={w}>
+                {w}
+              </option>
+            ))}
           </select>
+
           <button onClick={handleConnect} disabled={!selectedWallet || loading}>
             {loading ? "Connecting..." : "Connect Wallet"}
           </button>
@@ -105,11 +143,14 @@ export default function Wallet() {
       ) : (
         <div className="wallet-connected">
           <p>✓ Wallet Connected</p>
-          <p><strong>Address:</strong> {address}</p>
+          <p>
+            <strong>Address:</strong> {address}
+          </p>
           <button onClick={handleDisconnect}>Disconnect Wallet</button>
         </div>
       )}
 
+      {/* Send ADA section */}
       {lucid && (
         <div className="wallet-section">
           <h3>Send ADA</h3>
@@ -121,6 +162,7 @@ export default function Wallet() {
               onChange={(e) => setRecipient(e.target.value)}
               disabled={loading}
             />
+
             <input
               type="number"
               placeholder="Amount in Lovelace (1 ADA = 1,000,000)"
@@ -128,13 +170,59 @@ export default function Wallet() {
               onChange={(e) => setAmount(e.target.value)}
               disabled={loading}
             />
-            <button onClick={handleSend} disabled={loading || !recipient || !amount}>
+
+            <button
+              onClick={handleSend}
+              disabled={loading || !recipient || !amount}
+            >
               {loading ? "Sending..." : "Send ADA"}
             </button>
           </div>
 
-          {error && <div className="wallet-error"><strong>Error:</strong> {error}</div>}
-          {txHash && <div className="wallet-success"><strong>Success!</strong> Transaction submitted!<br /><strong>Hash:</strong> {txHash}</div>}
+          {/* Transaction Error */}
+          {error && (
+            <div className="wallet-error">
+              <strong>Error:</strong> {error}
+            </div>
+          )}
+
+          {/* Transaction Success */}
+          {txHash && (
+            <div className="wallet-success">
+              <strong>Success!</strong> Transaction submitted!
+              <br />
+              <strong>Hash:</strong> {txHash}
+              <br />
+
+              {/* CLICKABLE CARDANOSCAN LINK */}
+              <div style={{ marginTop: "8px" }}>
+                <a
+                  href={`https://preprod.cardanoscan.io/transaction/${txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: "#1a73e8",
+                    fontWeight: "bold",
+                    textDecoration: "underline",
+                  }}
+                >
+                  View on Cardanoscan →
+                </a>
+              </div>
+
+              {/* WAITING REMINDER */}
+              <p
+                style={{
+                  marginTop: "6px",
+                  fontSize: "12px",
+                  color: "#666",
+                }}
+              >
+                🕒 Please wait 3–5 minutes for Cardanoscan to display the
+                transaction.
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
