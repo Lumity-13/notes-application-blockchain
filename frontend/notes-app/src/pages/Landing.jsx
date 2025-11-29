@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../css/Landing.css";
 
 import { useAuth } from "../context/AuthContext";
+import { getNotesByUser, deleteNote } from "../api/notes";
 
 import Wallet from "./Wallet";
 import Profile from "./Profile";
@@ -10,6 +11,8 @@ import Profile from "./Profile";
 const Landing = () => {
     const [openDropdown, setOpenDropdown] = useState(false);
     const [activeTab, setActiveTab] = useState("notes");
+    const [notes, setNotes] = useState([]);
+    const [isLoadingNotes, setIsLoadingNotes] = useState(true);
 
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -28,11 +31,25 @@ const Landing = () => {
         return () => document.removeEventListener("click", handleClickOutside);
     }, [openDropdown]);
 
-    const notes = [
-        { id: 1, title: "Test", date: "12/12/2021", text: "Lorem ipsum dolor sit amet...", color: "yellow" },
-        { id: 2, title: "Mid test exam", date: "12/12/2021", text: "Ultrices viverra odio congue...", color: "red" },
-        { id: 3, title: "Jonas's notes", date: "12/12/2021", text: "Rokity viverra odio congue...", color: "blue" }
-    ];
+    // Load notes from backend
+    useEffect(() => {
+        if (user?.id && activeTab === "notes") {
+            loadNotes();
+        }
+    }, [user, activeTab]);
+
+    const loadNotes = async () => {
+        try {
+            setIsLoadingNotes(true);
+            const response = await getNotesByUser(user.id);
+            setNotes(response.data);
+        } catch (error) {
+            console.error('Error loading notes:', error);
+            setNotes([]);
+        } finally {
+            setIsLoadingNotes(false);
+        }
+    };
 
     const handleLogout = () => {
         logout();
@@ -41,6 +58,27 @@ const Landing = () => {
 
     const handleProfileClick = () => {
         setActiveTab("profile");
+    };
+
+    const handleNewNote = () => {
+        navigate("/notes");
+    };
+
+    const handleOpenNote = (noteId) => {
+        navigate("/notes", { state: { noteId } });
+    };
+
+    const handleDeleteNote = async (noteId, e) => {
+        e.stopPropagation();
+        if (window.confirm("Are you sure you want to delete this note?")) {
+            try {
+                await deleteNote(noteId);
+                setNotes(prevNotes => prevNotes.filter(note => note.id !== noteId));
+            } catch (error) {
+                console.error('Error deleting note:', error);
+                alert('Failed to delete note. Please try again.');
+            }
+        }
     };
 
     // Get user initials for avatar
@@ -52,6 +90,28 @@ const Landing = () => {
     // Check if user has avatar
     const hasAvatar = () => {
         return user?.avatarUrl && user.avatarUrl !== "/default-avatar.png";
+    };
+
+    // Get note color based on index
+    const getNoteColor = (index) => {
+        const colors = ["yellow", "red", "blue", "green", "purple", "pink"];
+        return colors[index % colors.length];
+    };
+
+    // Format date
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+            month: '2-digit', 
+            day: '2-digit', 
+            year: 'numeric' 
+        });
+    };
+
+    // Truncate text
+    const truncateText = (text, maxLength = 100) => {
+        if (!text) return "";
+        return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
     };
 
     return (
@@ -168,16 +228,42 @@ const Landing = () => {
                             <h2 className="sectionTitle">My Notes</h2>
                         </div>
 
-                        <div className="notesGrid">
-                            {notes.map((note) => (
-                                <div key={note.id} className={`noteCard ${note.color}`}>
-                                    <div className="noteDate">{note.date}</div>
-                                    <h3 className="noteTitle">{note.title}</h3>
-                                    <p className="noteText">{note.text}</p>
-                                </div>
-                            ))}
-                            <button className="newNote">+ New Note</button>
-                        </div>
+                        {isLoadingNotes ? (
+                            <div style={{ 
+                                textAlign: 'center', 
+                                padding: '2rem', 
+                                color: '#9ca3af' 
+                            }}>
+                                Loading notes...
+                            </div>
+                        ) : (
+                            <div className="notesGrid">
+                                {notes.map((note, index) => (
+                                    <div 
+                                        key={note.id} 
+                                        className={`noteCard ${getNoteColor(index)}`}
+                                        onClick={() => handleOpenNote(note.id)}
+                                        style={{ cursor: 'pointer', position: 'relative' }}
+                                    >
+                                        <button
+                                            className="noteDeleteBtn"
+                                            onClick={(e) => handleDeleteNote(note.id, e)}
+                                            title="Delete note"
+                                        >
+                                            ×
+                                        </button>
+                                        <div className="noteDate">
+                                            {note.createdAt ? formatDate(note.createdAt) : 'No date'}
+                                        </div>
+                                        <h3 className="noteTitle">{note.title || 'Untitled'}</h3>
+                                        <p className="noteText">{truncateText(note.content)}</p>
+                                    </div>
+                                ))}
+                                <button className="newNote" onClick={handleNewNote}>
+                                    + New Note
+                                </button>
+                            </div>
+                        )}
                     </section>
                 )}
 

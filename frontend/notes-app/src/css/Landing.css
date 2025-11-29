@@ -266,6 +266,7 @@
     cursor: pointer;
     transition: all 0.2s;
     border: 1px solid transparent;
+    position: relative;
 }
 
 .noteCard:hover {
@@ -296,6 +297,39 @@
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+}
+
+/* Note Delete Button */
+.noteDeleteBtn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.noteCard:hover .noteDeleteBtn {
+    opacity: 1;
+}
+
+.noteDeleteBtn:hover {
+    background: rgba(220, 38, 38, 0.9);
+    color: white;
+    transform: scale(1.1);
 }
 
 .newNote {
@@ -333,6 +367,21 @@
 .noteCard.blue {
     background: #dbeafe;
     border-color: #60a5fa;
+}
+
+.noteCard.green {
+    background: #d1fae5;
+    border-color: #34d399;
+}
+
+.noteCard.purple {
+    background: #e9d5ff;
+    border-color: #a78bfa;
+}
+
+.noteCard.pink {
+    background: #fce7f3;
+    border-color: #f472b6;
 }
 
 /* Wallet and Profile Container */
