@@ -50,7 +50,9 @@ const NotesPage = () => {
           setActiveTabId(formattedTabs[0].id);
         }
         
-        setNextTabId(Math.max(...notes.map(n => n.id)) + 1);
+        // Set next temp ID to avoid conflicts
+        const maxId = Math.max(...notes.map(n => n.id));
+        setNextTabId(maxId + 1);
       } else {
         // Create first note if none exist
         await handleAddTab();
@@ -75,45 +77,60 @@ const NotesPage = () => {
         content: tab.content
       };
 
+      console.log('Saving note:', { id: tab.id, isSaved: tab.isSaved, noteData });
+
       let savedId = tab.id;
 
-      if (tab.isSaved) {
+      if (tab.isSaved && !String(tab.id).startsWith('temp-')) {
         // Update existing note
+        console.log('Updating existing note with ID:', tab.id);
         await updateNote(tab.id, noteData);
-      } else {
-        // Create new note
-        const response = await createNote(user.id, noteData);
-        savedId = response.data.id;
         
-        // Update tab with real ID from backend
+        // Mark as saved
         setTabs(prevTabs =>
           prevTabs.map(t =>
             t.id === tab.id
-              ? { ...t, id: savedId, isSaved: true, hasUnsavedChanges: false }
+              ? { ...t, hasUnsavedChanges: false }
               : t
           )
         );
+      } else {
+        // Create new note
+        console.log('Creating new note for user:', user.id);
+        const response = await createNote(user.id, noteData);
+        console.log('Create response:', response.data);
+        savedId = response.data.id;
+        
+        const oldTabId = tab.id;
+        
+        // Update tab with real ID from backend and remove old temp tab
+        setTabs(prevTabs => {
+          // Replace the temp tab with the saved tab
+          return prevTabs.map(t =>
+            t.id === oldTabId
+              ? { 
+                  ...t, 
+                  id: savedId, 
+                  isSaved: true, 
+                  hasUnsavedChanges: false 
+                }
+              : t
+          );
+        });
         
         // Update active tab ID if this was the active tab
-        if (activeTabId === tab.id) {
+        if (activeTabId === oldTabId) {
           setActiveTabId(savedId);
         }
         
         return savedId;
       }
       
-      // Mark as saved
-      setTabs(prevTabs =>
-        prevTabs.map(t =>
-          t.id === tab.id
-            ? { ...t, hasUnsavedChanges: false }
-            : t
-        )
-      );
-      
       return savedId;
     } catch (error) {
       console.error('Error saving note:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
       throw error;
     }
   };
@@ -127,13 +144,17 @@ const NotesPage = () => {
     }
 
     // Validate title and content
-    if (!activeTab.title || activeTab.title.trim() === '' || activeTab.title === 'Untitled') {
-      alert('Please enter a title before saving.');
+    const trimmedTitle = activeTab.title?.trim() || '';
+    const trimmedContent = activeTab.content?.trim() || '';
+    
+    // Check if title starts with "Untitled" or is empty
+    if (!trimmedTitle || trimmedTitle.startsWith('Untitled')) {
+      alert('Please enter a proper title before saving (not "Untitled").');
       titleRef.current?.focus();
       return;
     }
 
-    if (!activeTab.content || activeTab.content.trim() === '') {
+    if (!trimmedContent) {
       alert('Please enter some content before saving.');
       editorRef.current?.focus();
       return;
@@ -154,7 +175,7 @@ const NotesPage = () => {
     setTabs(prevTabs =>
       prevTabs.map(tab =>
         tab.id === activeTabId
-          ? { ...tab, title: newTitle || 'Untitled', hasUnsavedChanges: true }
+          ? { ...tab, title: newTitle || `Untitled-${tab.id}`, hasUnsavedChanges: true }
           : tab
       )
     );
