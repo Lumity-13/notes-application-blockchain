@@ -195,35 +195,38 @@ const NotesPage = () => {
   const handleTabSelect = (tabId) => setActiveTabId(tabId);
 
   const handleTabClose = async (tabId) => {
-    if (tabs.length === 1) return;
+  if (tabs.length === 1) return;
+  
+  const tabToClose = tabs.find(tab => tab. id === tabId);
+  
+  if (tabToClose?. isSaved && ! String(tabToClose.id). startsWith('temp-')) {
+    if (tabToClose.hasUnsavedChanges) {
+      const confirmClose = window.confirm('You have unsaved changes. Close without saving?');
+      if (!confirmClose) return;
+    }
     
-    const tabToClose = tabs.find(tab => tab.id === tabId);
+    try {
+      await deleteNote(tabId);
+    } catch (error) {
+      console. error('Error deleting note:', error);
+    }
+  }
+  
+  setTabs(prevTabs => {
+    const newTabs = prevTabs. filter(tab => tab.id !== tabId);
     
-    // Only delete from backend if it's a saved note (has a real ID from backend)
-    if (tabToClose?.isSaved && !String(tabToClose.id).startsWith('temp-')) {
-      // Check if there are unsaved changes
-      if (tabToClose.hasUnsavedChanges) {
-        const confirmClose = window.confirm('You have unsaved changes. Close without saving?');
-        if (!confirmClose) return;
-      }
-      
-      try {
-        await deleteNote(tabId);
-      } catch (error) {
-        console.error('Error deleting note:', error);
+    // Fix: Only update activeTabId if we're closing the active tab
+    if (tabId === activeTabId && newTabs.length > 0) {
+      const tabIndex = prevTabs. findIndex(tab => tab.id === tabId);
+      const newActiveTab = newTabs[Math. min(tabIndex, newTabs.length - 1)] || newTabs[0];
+      if (newActiveTab) {
+        setActiveTabId(newActiveTab.id);
       }
     }
     
-    setTabs(prevTabs => {
-      const newTabs = prevTabs.filter(tab => tab.id !== tabId);
-      if (tabId === activeTabId) {
-        const tabIndex = prevTabs.findIndex(tab => tab.id === tabId);
-        const newActiveTab = newTabs[Math.max(0, tabIndex - 1)];
-        setActiveTabId(newActiveTab.id);
-      }
-      return newTabs;
-    });
-  };
+    return newTabs;
+  });
+};
 
   const handleAddTab = async () => {
     const newTab = { 

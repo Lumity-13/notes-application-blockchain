@@ -70,10 +70,10 @@ const Landing = () => {
 
     const handleDeleteNote = async (noteId, e) => {
         e.stopPropagation();
-        if (window.confirm("Are you sure you want to delete this note?")) {
+        if (window.confirm("Are you sure you want to delete this note? ")) {
             try {
                 await deleteNote(noteId);
-                setNotes(prevNotes => prevNotes.filter(note => note.id !== noteId));
+                setNotes(prevNotes => prevNotes.filter(note => (note.id || note.noteId) !== noteId));
             } catch (error) {
                 console.error('Error deleting note:', error);
                 alert('Failed to delete note. Please try again.');
@@ -101,10 +101,10 @@ const Landing = () => {
     // Format date
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            month: '2-digit', 
-            day: '2-digit', 
-            year: 'numeric' 
+        return date.toLocaleDateString('en-US', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric'
         });
     };
 
@@ -180,9 +180,9 @@ const Landing = () => {
                         <>
                             <div className="userAvatar">
                                 {hasAvatar() ? (
-                                    <img 
-                                        src={user.avatarUrl} 
-                                        alt="User Avatar" 
+                                    <img
+                                        src={user.avatarUrl}
+                                        alt="User Avatar"
                                         className="userAvatarImage"
                                         onError={(e) => {
                                             e.target.style.display = 'none';
@@ -190,8 +190,8 @@ const Landing = () => {
                                         }}
                                     />
                                 ) : null}
-                                <div 
-                                    className="userAvatarInitials" 
+                                <div
+                                    className="userAvatarInitials"
                                     style={{ display: hasAvatar() ? 'none' : 'flex' }}
                                 >
                                     {getUserInitials()}
@@ -203,12 +203,12 @@ const Landing = () => {
                             </div>
                         </>
                     )}
-                    <button 
-                        className="loginButton" 
+                    <button
+                        className="loginButton"
                         onClick={(e) => {
                             e.stopPropagation();
                             handleLogout();
-                        }} 
+                        }}
                         title="Logout"
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -229,18 +229,18 @@ const Landing = () => {
                         </div>
 
                         {isLoadingNotes ? (
-                            <div style={{ 
-                                textAlign: 'center', 
-                                padding: '2rem', 
-                                color: '#9ca3af' 
+                            <div style={{
+                                textAlign: 'center',
+                                padding: '2rem',
+                                color: '#9ca3af'
                             }}>
                                 Loading notes...
                             </div>
                         ) : (
                             <div className="notesGrid">
                                 {notes.map((note, index) => (
-                                    <div 
-                                        key={note.id} 
+                                    <div
+                                        key={note.id}
                                         className={`noteCard ${getNoteColor(index)}`}
                                         onClick={() => handleOpenNote(note.id)}
                                         style={{ cursor: 'pointer', position: 'relative' }}
