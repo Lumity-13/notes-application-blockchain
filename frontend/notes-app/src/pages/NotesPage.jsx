@@ -17,6 +17,7 @@ const NotesPage = () => {
   const [nextTabId, setNextTabId] = useState(1);
   const [isFindReplaceOpen, setIsFindReplaceOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false); // Prevent double loading
   
   // Wallet payment modal state
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -30,12 +31,16 @@ const NotesPage = () => {
 
   // Load notes from backend on mount
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && !hasLoaded) {
       loadNotes();
     }
-  }, [user]);
+  }, [user, hasLoaded]);
 
   const loadNotes = async () => {
+    // Prevent double loading
+    if (hasLoaded) return;
+    setHasLoaded(true);
+    
     try {
       setIsLoading(true);
       const response = await getNotesByUser(user.id);
@@ -82,11 +87,32 @@ const NotesPage = () => {
         }
       } else {
         // Create first note if none exist
-        await handleAddTab();
+        const newTab = {
+          id: `temp-1`,
+          title: `Untitled-1`,
+          content: '',
+          txHash: null,
+          hasUnsavedChanges: false,
+          isSaved: false
+        };
+        setTabs([newTab]);
+        setActiveTabId(newTab.id);
+        setNextTabId(2);
       }
     } catch (error) {
       console.error('Error loading notes:', error);
-      await handleAddTab();
+      // Create first note on error
+      const newTab = {
+        id: `temp-1`,
+        title: `Untitled-1`,
+        content: '',
+        txHash: null,
+        hasUnsavedChanges: false,
+        isSaved: false
+      };
+      setTabs([newTab]);
+      setActiveTabId(newTab.id);
+      setNextTabId(2);
     } finally {
       setIsLoading(false);
     }
@@ -287,7 +313,7 @@ const NotesPage = () => {
     setTabs(newTabs);
   };
 
-  const handleAddTab = async () => {
+  const handleAddTab = () => {
     const newTab = {
       id: `temp-${nextTabId}`,
       title: `Untitled-${nextTabId}`,
